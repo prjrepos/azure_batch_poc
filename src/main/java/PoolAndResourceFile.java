@@ -7,7 +7,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import com.microsoft.azure.storage.*;
+
 import com.microsoft.azure.storage.blob.*;
+
+import utils.StorageService;
 
 import com.microsoft.azure.batch.*;
 import com.microsoft.azure.batch.auth.*;
@@ -26,18 +29,19 @@ public class PoolAndResourceFile {
     // How many tasks to run across how many nodes
     static int TASK_COUNT = 5;
     static int NODE_COUNT = 1;
+    private static StorageService storageSvc= new StorageService();
 
     // Modify these values to change which resources are deleted after the job finishes.
     // Skipping pool deletion will greatly speed up subsequent runs
-    static boolean CLEANUP_STORAGE_CONTAINER = true;
+    static boolean CLEANUP_STORAGE_CONTAINER = false;
     static boolean CLEANUP_JOB = true;
     static boolean CLEANUP_POOL = true;
 
     public static void main(String[] argv) throws Exception {
         BatchClient client = BatchClient.open(new BatchSharedKeyCredentials(BATCH_URI, BATCH_ACCOUNT, BATCH_ACCESS_KEY));
-        CloudBlobContainer container = createBlobContainerIfNotExists(STORAGE_ACCOUNT_NAME, STORAGE_ACCOUNT_KEY, STORAGE_CONTAINER_NAME);
+        CloudBlobContainer container = storageSvc.createBlobContainerIfNotExists(STORAGE_ACCOUNT_NAME, STORAGE_ACCOUNT_KEY, STORAGE_CONTAINER_NAME);
 
-        String userName = "azbatchuser";
+        String userName = "azbatchpoc";
         String poolId = userName + "-pooltest";
         String jobId = "PoolAndResourceFileJob-" + userName + "-" +
                 new Date().toString().replaceAll("(\\.|:|\\s)", "-");
@@ -203,55 +207,7 @@ public class PoolAndResourceFile {
         }
 
         return client.poolOperations().getPool(poolId);
-    }
-
-    /**
-     * Create blob container in order to upload file
-     * 
-     * @param storageAccountName  The name of the storage account to create or look up
-     * @param storageAccountKey   An SAS key for accessing the storage account
-     *
-     * @return  A newly created or existing storage container
-     */
-    private static CloudBlobContainer createBlobContainerIfNotExists(String storageAccountName, String storageAccountKey, String containerName)
-            throws URISyntaxException, StorageException {
-        System.out.println("Creating storage container " + containerName);
-
-        StorageCredentials credentials = new StorageCredentialsAccountAndKey(storageAccountName, storageAccountKey);
-        CloudBlobClient blobClient = new CloudStorageAccount(credentials, true).createCloudBlobClient();
-        CloudBlobContainer container = blobClient.getContainerReference(containerName);
-        container.createIfNotExists();
-
-        return container;
-    }
-
-    /**
-     * Upload a file to a blob container and return an SAS key
-     *
-     * @param container  The container to upload to
-     * @param source     The local file to upload
-     *
-     * @return An SAS key for the uploaded file
-     */
-    private static String uploadFileToCloud(CloudBlobContainer container, File source)
-            throws URISyntaxException, IOException, InvalidKeyException, StorageException {
-        CloudBlockBlob blob = container.getBlockBlobReference(source.getName());
-        blob.upload(new FileInputStream(source), source.length());
-
-        // Set SAS expiry time to 1 day from now
-        SharedAccessBlobPolicy policy = new SharedAccessBlobPolicy();
-        EnumSet<SharedAccessBlobPermissions> perEnumSet = EnumSet.of(SharedAccessBlobPermissions.READ);
-        policy.setPermissions(perEnumSet);
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(new Date());
-        cal.add(Calendar.DATE, 1);
-        policy.setSharedAccessExpiryTime(cal.getTime());
-
-        // Create SAS key
-        String sas = blob.generateSharedAccessSignature(policy, null);
-
-        return blob.getUri() + "?" + sas;
-    }
+    }    
 
     /**
      * Create a job and add some tasks
@@ -276,7 +232,8 @@ public class PoolAndResourceFile {
         String fileName = "test.txt";
         String localPath = "./" + fileName;
         String remotePath = "resources/" + fileName;
-        String signedUrl = uploadFileToCloud(container, new File(localPath));
+        storageSvc.downloadFileFromCloud(container);
+        String signedUrl = storageSvc.uploadFileToCloud(container, new File(localPath));
         List<ResourceFile> files = new ArrayList<>();
         files.add(new ResourceFile()
                 .withHttpUrl(signedUrl)
