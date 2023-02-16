@@ -16,12 +16,12 @@ import com.microsoft.azure.batch.protocol.models.*;
 public class PoolAndResourceFile {
 
     // Get Batch and storage account information from environment
-    static String BATCH_ACCOUNT = System.getenv("AZURE_BATCH_ACCOUNT");
-    static String BATCH_ACCESS_KEY = System.getenv("AZURE_BATCH_ACCESS_KEY");
-    static String BATCH_URI = System.getenv("AZURE_BATCH_ENDPOINT");
-    static String STORAGE_ACCOUNT_NAME = System.getenv("STORAGE_ACCOUNT_NAME");
-    static String STORAGE_ACCOUNT_KEY = System.getenv("STORAGE_ACCOUNT_KEY");
-    static String STORAGE_CONTAINER_NAME = "poolandresourcefile";
+    static String BATCH_ACCOUNT = "azurebatchpoc";
+    static String BATCH_ACCESS_KEY = "PmWnRbeONXqgkCudDA1JKSnUrhHAGu7XmXvmoRy0suOL/lw2KABzYUVb8hHFyaZ8e7OA8SYO7Ynf+ABanSsE7g==";
+    static String BATCH_URI = "https://azurebatchpoc.uksouth.batch.azure.com";
+    static String STORAGE_ACCOUNT_NAME = "samplepoc2022";
+    static String STORAGE_ACCOUNT_KEY = "gF/wMAN3w28a/HBI8hU6PRb00mHb+gUzWOLyae8n5Ss34P9rsrfgg/vaY/+aan0/QhtY/pVMDsUT+AStqT2Jog==";
+    static String STORAGE_CONTAINER_NAME = "azure-batch-storage";
 
     // How many tasks to run across how many nodes
     static int TASK_COUNT = 5;
@@ -37,7 +37,7 @@ public class PoolAndResourceFile {
         BatchClient client = BatchClient.open(new BatchSharedKeyCredentials(BATCH_URI, BATCH_ACCOUNT, BATCH_ACCESS_KEY));
         CloudBlobContainer container = createBlobContainerIfNotExists(STORAGE_ACCOUNT_NAME, STORAGE_ACCOUNT_KEY, STORAGE_CONTAINER_NAME);
 
-        String userName = System.getProperty("user.name");
+        String userName = "azbatchuser";
         String poolId = userName + "-pooltest";
         String jobId = "PoolAndResourceFileJob-" + userName + "-" +
                 new Date().toString().replaceAll("(\\.|:|\\s)", "-");
@@ -113,7 +113,7 @@ public class PoolAndResourceFile {
         // Create a pool with 1 A1 VM
         String osPublisher = "OpenLogic";
         String osOffer = "CentOS";
-        String poolVMSize = "STANDARD_A1";
+        String poolVMSize = "Standard_A1_v2";
         int poolVMCount = 1;
         Duration poolSteadyTimeout = Duration.ofMinutes(5);
         Duration vmReadyTimeout = Duration.ofMinutes(20);
