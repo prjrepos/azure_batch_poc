@@ -1,10 +1,14 @@
 package azbatch.utils;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.security.InvalidKeyException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -21,12 +25,17 @@ import com.microsoft.azure.batch.protocol.models.ImageReference;
 import com.microsoft.azure.batch.protocol.models.OSType;
 import com.microsoft.azure.batch.protocol.models.PoolInformation;
 import com.microsoft.azure.batch.protocol.models.PoolState;
+import com.microsoft.azure.batch.protocol.models.ResourceFile;
 import com.microsoft.azure.batch.protocol.models.TaskAddParameter;
 import com.microsoft.azure.batch.protocol.models.TaskState;
 import com.microsoft.azure.batch.protocol.models.VerificationType;
 import com.microsoft.azure.batch.protocol.models.VirtualMachineConfiguration;
 import com.microsoft.azure.storage.StorageException;
 import com.microsoft.azure.storage.blob.CloudBlobContainer;
+import com.microsoft.azure.storage.blob.CloudBlockBlob;
+import com.microsoft.azure.storage.blob.SharedAccessBlobPermissions;
+import com.microsoft.azure.storage.blob.SharedAccessBlobPolicy;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import azbatch.constants.AzBatchConfig;
@@ -161,16 +170,16 @@ public class AzBatchUtilities {
         poolInfo.withPoolId(poolId);
         client.jobOperations().createJob(jobId, poolInfo);
 
-        // // Upload a resource file and make it available in a "resources" subdirectory on
-        // // nodes
-        // String fileName = "test.txt";
-        // String localPath = "./" + fileName;
-        // String remotePath = "resources/" + fileName;
-        // String signedUrl = uploadFileToCloud(container, new File(localPath));
-        // List<ResourceFile> files = new ArrayList<>();
-        // files.add(new ResourceFile()
-        //         .withHttpUrl(signedUrl)
-        //         .withFilePath(remotePath));
+        // Upload a resource file and make it available in a "resources" subdirectory on
+        // nodes
+        String fileName = "test.txt";
+        String localPath = "./" + fileName;
+        String remotePath = "resources/" + fileName;
+        String signedUrl = uploadFileToCloud(container, new File(localPath));
+        List<ResourceFile> files = new ArrayList<>();
+        files.add(new ResourceFile()
+                .withHttpUrl(signedUrl)
+                .withFilePath(remotePath));
 
         // Create tasks
         List<TaskAddParameter> tasks = new ArrayList<>();
@@ -178,7 +187,7 @@ public class AzBatchUtilities {
             tasks.add(new TaskAddParameter()
                         .withId("mytask" + i)
                         .withCommandLine("cat " + "remotePath")
-                        //.withResourceFiles(files)                    
+                        .withResourceFiles(files)                    
                     );
         }
         // Add the tasks to the job
@@ -231,21 +240,21 @@ public class AzBatchUtilities {
      *
      * @return An SAS key for the uploaded file
      */
-    // private static String uploadFileToCloud(CloudBlobContainer container, File source)
-    //         throws URISyntaxException, IOException, InvalidKeyException, StorageException {
-    //     CloudBlockBlob blob = container.getBlockBlobReference(source.getName());
-    //     blob.upload(new FileInputStream(source), source.length());
-    //     // Set SAS expiry time to 1 day from now
-    //     SharedAccessBlobPolicy policy = new SharedAccessBlobPolicy();
-    //     EnumSet<SharedAccessBlobPermissions> perEnumSet = EnumSet.of(SharedAccessBlobPermissions.READ);
-    //     policy.setPermissions(perEnumSet);
-    //     Calendar cal = Calendar.getInstance();
-    //     cal.setTime(new Date());
-    //     cal.add(Calendar.DATE, 1);
-    //     policy.setSharedAccessExpiryTime(cal.getTime());
-    //     // Create SAS key
-    //     String sas = blob.generateSharedAccessSignature(policy, null);
-    //     return blob.getUri() + "?" + sas;
-    // }
+    private static String uploadFileToCloud(CloudBlobContainer container, File source)
+            throws URISyntaxException, IOException, InvalidKeyException, StorageException {
+        CloudBlockBlob blob = container.getBlockBlobReference(source.getName());
+        blob.upload(new FileInputStream(source), source.length());
+        // Set SAS expiry time to 1 day from now
+        SharedAccessBlobPolicy policy = new SharedAccessBlobPolicy();
+        EnumSet<SharedAccessBlobPermissions> perEnumSet = EnumSet.of(SharedAccessBlobPermissions.READ);
+        policy.setPermissions(perEnumSet);
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(new Date());
+        cal.add(Calendar.DATE, 1);
+        policy.setSharedAccessExpiryTime(cal.getTime());
+        // Create SAS key
+        String sas = blob.generateSharedAccessSignature(policy, null);
+        return blob.getUri() + "?" + sas;
+    }
 
 }
