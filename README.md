@@ -2,6 +2,10 @@
 services: Batch
 platforms: java
 ---
+## References
+Java Doc Support link: https://learn.microsoft.com/en-us/java/api/com.microsoft.azure.batch.protocol.models.cloudjob?view=azure-java-stable
+Microsoft Documentation: https://learn.microsoft.com/en-us/azure/batch/batch-technical-overview
+Stakoverflow updates: https://stackoverflow.com/questions/tagged/azure-batch
 
 ## Description
 When run, this sample will:
