@@ -21,7 +21,7 @@ public class AzureBatchService {
     static boolean CLEANUP_STORAGE_CONTAINER = false;
     static boolean CLEANUP_JOB = true;
     // warning: Skipping pool deletion will greatly speed up subsequent runs
-    static boolean CLEANUP_POOL = true;
+    static boolean CLEANUP_POOL = false;
 
     /**
      * Method to read create Pool, assign node into Pool, create Job, create task
@@ -52,7 +52,8 @@ public class AzureBatchService {
         String jobId = "AzBatchJob-" + svcName + "-" +
                 new Date().toString().replaceAll("(\\.|:|\\s)", "-");
         try {
-            CloudPool sharedPool = AzBatchUtilities.createPoolIfNotExists(client);
+            //CloudPool sharedPool = AzBatchUtilities.createPoolIfNotExists(client);
+            CloudPool sharedPool = client.poolOperations().getPool(poolId);
             // Submit a job and wait for completion
             AzBatchUtilities.submitJob(client, container, sharedPool.id(), jobId);
             AzBatchUtilities.waitForTasksToComplete(client, jobId, Duration.ofMinutes(5));

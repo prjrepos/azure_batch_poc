@@ -5,6 +5,7 @@ platforms: java
 ## References
 Java Doc Support link: https://learn.microsoft.com/en-us/java/api/com.microsoft.azure.batch.protocol.models.cloudjob?view=azure-java-stable
 Microsoft Documentation: https://learn.microsoft.com/en-us/azure/batch/batch-technical-overview
+https://learn.microsoft.com/en-us/answers/questions/106667/azure-batch-execute-java-processes
 Stakoverflow updates: https://stackoverflow.com/questions/tagged/azure-batch
 
 ## Description
@@ -26,6 +27,12 @@ Set the following environment variables:
 - `AZURE_BATCH_ENDPOINT` -- The Batch account endpoint.
 - `STORAGE_ACCOUNT_NAME` -- The storage account to hold resource files.
 - `STORAGE_ACCOUNT_KEY` -- The storage account key.
+
+Install JRE on Pool Node Startup
+- sudo yum -y install java-1.8.0-openjdk
+
+Set Command to run Executable JAR while creating a Tak
+-  .withCommandLine("java -cp batchdemo-1.0-jar-with-dependencies.jar com.sample.testapp.App \"config.xml\"")
 
 Clone repo and compile the code:
 

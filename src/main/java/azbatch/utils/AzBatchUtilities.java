@@ -9,7 +9,10 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.time.Duration;
@@ -23,6 +26,9 @@ import com.microsoft.azure.batch.protocol.models.ComputeNode;
 import com.microsoft.azure.batch.protocol.models.ImageInformation;
 import com.microsoft.azure.batch.protocol.models.ImageReference;
 import com.microsoft.azure.batch.protocol.models.OSType;
+import com.microsoft.azure.batch.protocol.models.OutputFile;
+import com.microsoft.azure.batch.protocol.models.OutputFileBlobContainerDestination;
+import com.microsoft.azure.batch.protocol.models.OutputFileDestination;
 import com.microsoft.azure.batch.protocol.models.PoolInformation;
 import com.microsoft.azure.batch.protocol.models.PoolState;
 import com.microsoft.azure.batch.protocol.models.ResourceFile;
@@ -32,7 +38,9 @@ import com.microsoft.azure.batch.protocol.models.VerificationType;
 import com.microsoft.azure.batch.protocol.models.VirtualMachineConfiguration;
 import com.microsoft.azure.storage.StorageException;
 import com.microsoft.azure.storage.blob.CloudBlobContainer;
+import com.microsoft.azure.storage.blob.CloudBlobDirectory;
 import com.microsoft.azure.storage.blob.CloudBlockBlob;
+import com.microsoft.azure.storage.blob.ListBlobItem;
 import com.microsoft.azure.storage.blob.SharedAccessBlobPermissions;
 import com.microsoft.azure.storage.blob.SharedAccessBlobPolicy;
 
@@ -42,7 +50,7 @@ import azbatch.constants.AzBatchConfig;
 
 public class AzBatchUtilities {
 
-    private static final Logger logger = LogManager.getLogger(AzBatchUtilities.class);    
+    private static final Logger logger = LogManager.getLogger(AzBatchUtilities.class);
 
     /**
      * Create a pool if one doesn't already exist with the given ID
@@ -57,14 +65,14 @@ public class AzBatchUtilities {
 
         // Create a pool with 1 A1 VM
         String osPublisher = AzBatchConfig.OS_PUBLISHER;
-        String osOffer = AzBatchConfig.OS_OFFER;       
+        String osOffer = AzBatchConfig.OS_OFFER;
         String poolVMSize = AzBatchConfig.POOL_VM_SIZE;
-        String  poolId = AzBatchConfig.POOL_ID;
+        String poolId = AzBatchConfig.POOL_ID;
         int poolVMCount = AzBatchConfig.POOL_VM_COUNT;
-        int NODE_COUNT = AzBatchConfig.NODE_COUNT;        
+        int NODE_COUNT = AzBatchConfig.NODE_COUNT;
         Duration poolSteadyTimeout = Duration.ofMinutes(5);
         Duration vmReadyTimeout = Duration.ofMinutes(20);
-        
+
         // If the pool exists and is active (not being deleted), resize it
         if (client.poolOperations().existsPool(poolId)
                 && client.poolOperations().getPool(poolId).state().equals(PoolState.ACTIVE)) {
@@ -92,10 +100,11 @@ public class AzBatchUtilities {
                     }
                 }
             }
-
             // Use IaaS VM with Linux
             VirtualMachineConfiguration configuration = new VirtualMachineConfiguration();
-            configuration.withNodeAgentSKUId(skuId).withImageReference(imageRef);
+            configuration
+                    .withNodeAgentSKUId(skuId)
+                    .withImageReference(imageRef);
 
             client.poolOperations().createPool(poolId, poolVMSize, configuration, poolVMCount);
         }
@@ -115,7 +124,7 @@ public class AzBatchUtilities {
             System.out.print(".");
             TimeUnit.SECONDS.sleep(10);
             elapsedTime = (new Date()).getTime() - startTime;
-        }      
+        }
 
         if (!steady) {
             throw new TimeoutException("The pool did not reach a steady state in the allotted time");
@@ -142,7 +151,7 @@ public class AzBatchUtilities {
             System.out.print(".");
             TimeUnit.SECONDS.sleep(10);
             elapsedTime = (new Date()).getTime() - startTime;
-        }       
+        }
 
         if (!hasIdleVM) {
             throw new TimeoutException("The node did not reach an IDLE state in the allotted time");
@@ -169,30 +178,105 @@ public class AzBatchUtilities {
         PoolInformation poolInfo = new PoolInformation();
         poolInfo.withPoolId(poolId);
         client.jobOperations().createJob(jobId, poolInfo);
-
-        // Upload a resource file and make it available in a "resources" subdirectory on
-        // nodes
-        String fileName = "test.txt";
-        String localPath = "./" + fileName;
-        String remotePath = "resources/" + fileName;
-        String signedUrl = uploadFileToCloud(container, new File(localPath));
+        
+        //download application configuration files for the execution
+        String[] appfiles = { "batchdemo-1.0-jar-with-dependencies.jar", "config.xml" };
         List<ResourceFile> files = new ArrayList<>();
-        files.add(new ResourceFile()
-                .withHttpUrl(signedUrl)
-                .withFilePath(remotePath));
+        for (String fileName : appfiles) {
+            String localPath = "./" + fileName;
+            String signedUrl = getAppStorageUri(container, "apps", fileName);
+            files.add(new ResourceFile()
+                    .withHttpUrl(signedUrl)                  
+                    .withFilePath(localPath));
+        }
+
+        //download application metadata folders & files for the Voltage operation
+        String[] appfolders = { "trustStore", "cache" };
+        for (String folder : appfolders) {
+            Map<String, String> signedUrls = getAppStorageUri(container, folder);
+            for (Entry<String, String> entry : signedUrls.entrySet()) {
+                String localPath = "./" + folder + "/" + entry.getKey();                
+                files.add(new ResourceFile()
+                        .withHttpUrl(entry.getValue())
+                        .withFilePath(localPath));
+            }
+        }
 
         // Create tasks
         List<TaskAddParameter> tasks = new ArrayList<>();
         for (int i = 0; i < taskCount; i++) {
             tasks.add(new TaskAddParameter()
-                        .withId("mytask" + i)
-                        .withCommandLine("cat " + "remotePath")
-                        .withResourceFiles(files)                    
+                    .withId("mytask" + i)
+                    .withCommandLine(
+                            "java -cp batchdemo-1.0-jar-with-dependencies.jar com.sample.testapp.App \"config.xml\"")
+                    .withResourceFiles(files)
+                    //.withOutputFiles(logfiles)
                     );
         }
         // Add the tasks to the job
         client.taskOperations().createTasks(jobId, tasks);
     }
+
+    /**
+     * Get SAS key of the application files to be downloaded
+     *
+     * @param container The container from download
+     * @param dir    The remote directory to download
+     * @param source    The remote file to download
+     *
+     * @return A SAS key for the file
+     */
+    private static String getAppStorageUri(CloudBlobContainer container, String dir, String file)
+            throws URISyntaxException, IOException, InvalidKeyException, StorageException {
+
+        CloudBlobDirectory blobDir = container.getDirectoryReference(dir);
+        CloudBlockBlob blob = blobDir.getBlockBlobReference(file);
+        // Set SAS expiry time to 1 day from now
+        SharedAccessBlobPolicy policy = new SharedAccessBlobPolicy();
+        EnumSet<SharedAccessBlobPermissions> perEnumSet = EnumSet.of(SharedAccessBlobPermissions.READ);
+        policy.setPermissions(perEnumSet);
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(new Date());
+        cal.add(Calendar.DATE, 1);
+        policy.setSharedAccessExpiryTime(cal.getTime());
+        // Create SAS key
+        String sas = blob.generateSharedAccessSignature(policy, null);       
+        return blob.getUri() + "?" + sas;
+    }
+
+    /**
+     * Get SAS key of all files to be downloaded from a Blob Directory
+     *
+     * @param container The container from download
+     * @param dir    The remote directory to download
+     *
+     * @return A SAS key for the file
+     */
+    private static Map<String, String> getAppStorageUri(CloudBlobContainer container, String dir)
+            throws URISyntaxException, IOException, InvalidKeyException, StorageException {
+
+        Map<String, String> map = new HashMap<String, String>();
+        CloudBlobDirectory blobDir = container.getDirectoryReference(dir);
+        Iterable<ListBlobItem> blobs = blobDir.listBlobs();
+        
+        for (ListBlobItem blob : blobs) {
+            String path = blob.getUri().getPath();
+            String file = path.substring(path.lastIndexOf("/") + 1);
+            CloudBlockBlob blockBlob = blobDir.getBlockBlobReference(file);
+            // Set SAS expiry time to 1 day from now
+            SharedAccessBlobPolicy policy = new SharedAccessBlobPolicy();
+            EnumSet<SharedAccessBlobPermissions> perEnumSet = EnumSet.of(SharedAccessBlobPermissions.READ);
+            policy.setPermissions(perEnumSet);
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(new Date());
+            cal.add(Calendar.DATE, 1);
+            policy.setSharedAccessExpiryTime(cal.getTime());
+            // Create SAS key
+            String sas = blockBlob.generateSharedAccessSignature(policy, null);
+            map.put(file, blob.getUri() + "?" + sas);
+        }         
+        return map;
+    }    
 
     /**
      * Wait for all tasks in a given job to be completed, or throw an exception on
@@ -231,30 +315,4 @@ public class AzBatchUtilities {
         }
         throw new TimeoutException("Task did not complete within the specified timeout");
     }
-
-    /**
-     * Upload a file to a blob container and return an SAS key
-     *
-     * @param container  The container to upload to
-     * @param source     The local file to upload
-     *
-     * @return An SAS key for the uploaded file
-     */
-    private static String uploadFileToCloud(CloudBlobContainer container, File source)
-            throws URISyntaxException, IOException, InvalidKeyException, StorageException {
-        CloudBlockBlob blob = container.getBlockBlobReference(source.getName());
-        blob.upload(new FileInputStream(source), source.length());
-        // Set SAS expiry time to 1 day from now
-        SharedAccessBlobPolicy policy = new SharedAccessBlobPolicy();
-        EnumSet<SharedAccessBlobPermissions> perEnumSet = EnumSet.of(SharedAccessBlobPermissions.READ);
-        policy.setPermissions(perEnumSet);
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(new Date());
-        cal.add(Calendar.DATE, 1);
-        policy.setSharedAccessExpiryTime(cal.getTime());
-        // Create SAS key
-        String sas = blob.generateSharedAccessSignature(policy, null);
-        return blob.getUri() + "?" + sas;
-    }
-
 }

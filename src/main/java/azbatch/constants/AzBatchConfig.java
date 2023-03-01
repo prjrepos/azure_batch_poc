@@ -2,9 +2,6 @@ package azbatch.constants;
 
 public class AzBatchConfig {
 
-
-
-
     /* Configuration for perosonal subscription */
 
     public static final String BATCH_ACCOUNT = "azurebatchpoc";
