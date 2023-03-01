@@ -206,7 +206,7 @@ public class AzBatchUtilities {
         List<TaskAddParameter> tasks = new ArrayList<>();
         for (int i = 0; i < taskCount; i++) {
             tasks.add(new TaskAddParameter()
-                    .withId("mytask" + i)
+                    .withId("voltage-batch-task" + i)
                     .withCommandLine(
                             "java -cp batchdemo-1.0-jar-with-dependencies.jar com.sample.testapp.App \"config.xml\"")
                     .withResourceFiles(files)

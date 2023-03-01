@@ -31,6 +31,9 @@ Set the following environment variables:
 Install JRE on Pool Node Startup
 - sudo yum -y install java-1.8.0-openjdk
 
+Resource gets created in "/mnt/resource/batch/tasks/startup/wd" from startup resource 
+- command to run from ADF "sudo java -cp /mnt/resource/batch/tasks/startup/wd/AzureBatchService-1.0.0-jar-with-dependencies.jar AzureBatchService"
+
 Set Command to run Executable JAR while creating a Tak
 -  .withCommandLine("java -cp batchdemo-1.0-jar-with-dependencies.jar com.sample.testapp.App \"config.xml\"")
 
