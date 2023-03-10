@@ -2,7 +2,24 @@ package azbatch.constants;
 
 public class AzBatchConfig {
 
+    /* Configuration for Boots subscription */
 
+    // public static final String BATCH_ACCOUNT = "devceployaba01";
+    // public static final String BATCH_ACCESS_KEY = "/mln3Tdo5z526ZbyJJZR2aj4lvQp+mx/rimvNEQ3ST/8O975WVHxyUeEW5tLsrpnUclb3KvpUQyI+ABawdSk/A==";
+    // public static final String BATCH_URI = "https://devceployaba01.northeurope.batch.azure.com";
+    // public static final String STORAGE_ACCOUNT_NAME = "devceployadls01";
+    // public static final String STORAGE_ACCOUNT_KEY = "tDoFUVjhzAhNKnkMCOFSk3pDIoCXP4CC/pqqSVX6F/eI05lXSZ4AuTdqMVP7SZP1KyC9jM24ZHEG+AStX4aOlw==";
+    // public static final String STORAGE_CONTAINER_NAME = "azure-batch-storage";
+    // public static final String POOL_ID = "devceployaba01-pool-01";
+    // public static final int TASK_COUNT = 5;
+    // public static final int NODE_COUNT = 1;
+    // public static final String OS_PUBLISHER = "OpenLogic";
+    // public static final String OS_OFFER = "CentOS";
+    // public static final String POOL_VM_SIZE = "Standard_A1_v2";
+    // public static final int POOL_VM_COUNT = 1;
+
+
+    /* Configuration for perosonal subscription */
 
     public static final String BATCH_ACCOUNT = "azurebatchpoc";
     public static final String BATCH_ACCESS_KEY = "PmWnRbeONXqgkCudDA1JKSnUrhHAGu7XmXvmoRy0suOL/lw2KABzYUVb8hHFyaZ8e7OA8SYO7Ynf+ABanSsE7g==";
@@ -10,6 +27,7 @@ public class AzBatchConfig {
     public static final String STORAGE_ACCOUNT_NAME = "samplepoc2022";
     public static final String STORAGE_ACCOUNT_KEY = "gF/wMAN3w28a/HBI8hU6PRb00mHb+gUzWOLyae8n5Ss34P9rsrfgg/vaY/+aan0/QhtY/pVMDsUT+AStqT2Jog==";
     public static final String STORAGE_CONTAINER_NAME = "azure-batch-storage";
+    public static final String APP_METADATA_FOLDER = "azbatch-voltage-metadata";
     public static final String POOL_ID = "devceployaba01-pool-01";
     public static final int TASK_COUNT = 1;
     public static final int NODE_COUNT = 1;

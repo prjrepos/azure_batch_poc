@@ -15,6 +15,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+
+import javax.lang.model.util.ElementScanner6;
+
 import java.time.Duration;
 import com.microsoft.azure.batch.BatchClient;
 import com.microsoft.azure.batch.DetailLevel;
@@ -171,7 +174,7 @@ public class AzBatchUtilities {
     public static void submitJob(BatchClient client, CloudBlobContainer container, String poolId, String jobId)
             throws BatchErrorException, IOException, StorageException, InvalidKeyException, InterruptedException,
             URISyntaxException {
-        int taskCount = AzBatchConfig.TASK_COUNT;
+        int taskCount = AzBatchConfig.TASK_COUNT;       
         logger.info("Submitting job " + jobId + " with " + taskCount + " tasks");
 
         // Create job
@@ -180,7 +183,8 @@ public class AzBatchUtilities {
         client.jobOperations().createJob(jobId, poolInfo);
         
         //download application configuration files for the execution
-        String[] appfiles = { "batchdemo-1.0-jar-with-dependencies.jar", "config.xml" };
+        //String[] appfiles = { "batchdemo-1.0-jar-with-dependencies.jar", "batchdemo_config.xml" };
+        String[] appfiles = { "boots-voltage-fle-utility-0.0.1-jar-with-dependencies.jar", "voltage_service_config_01.xml" };
         List<ResourceFile> files = new ArrayList<>();
         for (String fileName : appfiles) {
             String localPath = "./" + fileName;
@@ -195,7 +199,7 @@ public class AzBatchUtilities {
         for (String folder : appfolders) {
             Map<String, String> signedUrls = getAppStorageUri(container, folder);
             for (Entry<String, String> entry : signedUrls.entrySet()) {
-                String localPath = "./" + folder + "/" + entry.getKey();                
+                String localPath = folder + "/" + entry.getKey();                
                 files.add(new ResourceFile()
                         .withHttpUrl(entry.getValue())
                         .withFilePath(localPath));
@@ -208,7 +212,9 @@ public class AzBatchUtilities {
             tasks.add(new TaskAddParameter()
                     .withId("voltage-batch-task" + i)
                     .withCommandLine(
-                            "java -cp batchdemo-1.0-jar-with-dependencies.jar com.sample.testapp.App \"config.xml\"")
+                            //"java -cp batchdemo-1.0-jar-with-dependencies.jar main.java.com.sample.testapp.App \"batchdemo_config.xml\""
+                            "java -cp boots-voltage-fle-utility-0.0.1-jar-with-dependencies.jar main.java.com.boots.voltage.VoltageMainApplication \"voltage_service_config_01.xml\""
+                    )
                     .withResourceFiles(files)
                     //.withOutputFiles(logfiles)
                     );
@@ -229,8 +235,10 @@ public class AzBatchUtilities {
     private static String getAppStorageUri(CloudBlobContainer container, String dir, String file)
             throws URISyntaxException, IOException, InvalidKeyException, StorageException {
 
-        CloudBlobDirectory blobDir = container.getDirectoryReference(dir);
-        CloudBlockBlob blob = blobDir.getBlockBlobReference(file);
+        CloudBlobDirectory blobDir = null;
+        blobDir = container.getDirectoryReference(AzBatchConfig.APP_METADATA_FOLDER + "/" + dir);            
+            
+        CloudBlockBlob blob = blobDir.getBlockBlobReference(file);      
         // Set SAS expiry time to 1 day from now
         SharedAccessBlobPolicy policy = new SharedAccessBlobPolicy();
         EnumSet<SharedAccessBlobPermissions> perEnumSet = EnumSet.of(SharedAccessBlobPermissions.READ);
@@ -255,13 +263,18 @@ public class AzBatchUtilities {
     private static Map<String, String> getAppStorageUri(CloudBlobContainer container, String dir)
             throws URISyntaxException, IOException, InvalidKeyException, StorageException {
 
-        Map<String, String> map = new HashMap<String, String>();
-        CloudBlobDirectory blobDir = container.getDirectoryReference(dir);
-        Iterable<ListBlobItem> blobs = blobDir.listBlobs();
-        
+        Map<String, String> map = new HashMap<String, String>();       
+        CloudBlobDirectory blobDir = null;        
+        blobDir = container.getDirectoryReference(AzBatchConfig.APP_METADATA_FOLDER + "/" + dir);
+               
+        Iterable<ListBlobItem> blobs = blobDir.listBlobs();        
         for (ListBlobItem blob : blobs) {
+            if (blob instanceof CloudBlobDirectory) {
+                continue;                
+            }
             String path = blob.getUri().getPath();
-            String file = path.substring(path.lastIndexOf("/") + 1);
+            String file = path.substring(path.lastIndexOf("/") + 1);          
+            
             CloudBlockBlob blockBlob = blobDir.getBlockBlobReference(file);
             // Set SAS expiry time to 1 day from now
             SharedAccessBlobPolicy policy = new SharedAccessBlobPolicy();
@@ -277,6 +290,7 @@ public class AzBatchUtilities {
         }         
         return map;
     }    
+    
 
     /**
      * Wait for all tasks in a given job to be completed, or throw an exception on

@@ -29,10 +29,13 @@ Set the following environment variables:
 - `STORAGE_ACCOUNT_KEY` -- The storage account key.
 
 Install JRE on Pool Node Startup
-- sudo yum -y install java-1.8.0-openjdk
+- CentOs: sudo yum -y install java-1.8.0-openjdk
+- Ubuntu: /bin/bash -c "sudo apt-get update&&sudo apt-get install -y openjdk-8-jdk"
 
-Resource gets created in "/mnt/resource/batch/tasks/startup/wd" from startup resource 
-- command to run from ADF "sudo java -cp /mnt/resource/batch/tasks/startup/wd/AzureBatchService-1.0.0-jar-with-dependencies.jar AzureBatchService"
+Resource gets created from startup resource
+- CentOS "/mnt/resource/batch/tasks/startup/wd"
+- Ubuntu "/mnt/batch/tasks/startup/wd/"  
+- command to run from ADF "java -cp /mnt/batch/tasks/startup/wd/AzureBatchService-1.0.0-jar-with-dependencies.jar AzureBatchService"
 
 Set Command to run Executable JAR while creating a Tak
 -  .withCommandLine("java -cp batchdemo-1.0-jar-with-dependencies.jar com.sample.testapp.App \"config.xml\"")
