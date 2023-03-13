@@ -1,22 +1,6 @@
 package azbatch.constants;
 
-public class AzBatchConfig {
-
-    /* Configuration for Boots subscription */
-
-    // public static final String BATCH_ACCOUNT = "devceployaba01";
-    // public static final String BATCH_ACCESS_KEY = "/mln3Tdo5z526ZbyJJZR2aj4lvQp+mx/rimvNEQ3ST/8O975WVHxyUeEW5tLsrpnUclb3KvpUQyI+ABawdSk/A==";
-    // public static final String BATCH_URI = "https://devceployaba01.northeurope.batch.azure.com";
-    // public static final String STORAGE_ACCOUNT_NAME = "devceployadls01";
-    // public static final String STORAGE_ACCOUNT_KEY = "tDoFUVjhzAhNKnkMCOFSk3pDIoCXP4CC/pqqSVX6F/eI05lXSZ4AuTdqMVP7SZP1KyC9jM24ZHEG+AStX4aOlw==";
-    // public static final String STORAGE_CONTAINER_NAME = "azure-batch-storage";
-    // public static final String POOL_ID = "devceployaba01-pool-01";
-    // public static final int TASK_COUNT = 5;
-    // public static final int NODE_COUNT = 1;
-    // public static final String OS_PUBLISHER = "OpenLogic";
-    // public static final String OS_OFFER = "CentOS";
-    // public static final String POOL_VM_SIZE = "Standard_A1_v2";
-    // public static final int POOL_VM_COUNT = 1;
+public class AzBatchConfig {    
 
 
     /* Configuration for perosonal subscription */

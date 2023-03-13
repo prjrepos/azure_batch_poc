@@ -195,7 +195,7 @@ public class AzBatchUtilities {
         }
 
         //download application metadata folders & files for the Voltage operation
-        String[] appfolders = { "trustStore", "cache" };
+        String[] appfolders = { "trustStore"};
         for (String folder : appfolders) {
             Map<String, String> signedUrls = getAppStorageUri(container, folder);
             for (Entry<String, String> entry : signedUrls.entrySet()) {
@@ -274,7 +274,6 @@ public class AzBatchUtilities {
             }
             String path = blob.getUri().getPath();
             String file = path.substring(path.lastIndexOf("/") + 1);          
-            
             CloudBlockBlob blockBlob = blobDir.getBlockBlobReference(file);
             // Set SAS expiry time to 1 day from now
             SharedAccessBlobPolicy policy = new SharedAccessBlobPolicy();
