@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<batch-service-utility>
+        <Config>                
+                <!-- <StorageAccountName>devceployadls01</StorageAccountName>
+                <StorageAccountKey>tDoFUVjhzAhNKnkMCOFSk3pDIoCXP4CC/pqqSVX6F/eI05lXSZ4AuTdqMVP7SZP1KyC9jM24ZHEG+AStX4aOlw==</StorageAccountKey>
+                <StorageContainerName>batch</StorageContainerName> -->
+                <StorageAccountName>samplepoc2022</StorageAccountName>
+                <StorageAccountKey>gF/wMAN3w28a/HBI8hU6PRb00mHb+gUzWOLyae8n5Ss34P9rsrfgg/vaY/+aan0/QhtY/pVMDsUT+AStqT2Jog==</StorageAccountKey>
+                <StorageContainerName>azure-batch-storage</StorageContainerName>
+                <RawDataDirectory>azbatch-voltage-data/inbound</RawDataDirectory>
+                <EncryptedDataDirectory>azbatch-voltage-data/encrypted_import</EncryptedDataDirectory>
+                <DecryptedDataDirectory>azbatch-voltage-data/decrypted_export</DecryptedDataDirectory>
+				<AppMetdataDirectory>azbatch-voltage-metadata</AppMetdataDirectory>
+				<PoolId>devceployaba01-pool-01</PoolId>
+				<TaskCount>1</TaskCount>
+				<NodeCount>1</NodeCount>
+				<OSPublisher>OpenLogic</OSPublisher>
+				<OSOffer>CentOS</OSOffer>
+				<PoolVmSize>Standard_A1_v2</PoolVmSize>
+				<PoolVmCount>1</PoolVmCount>
+				<CleanUpStorage>false</CleanUpStorage>
+				<CleanUpJob>true</CleanUpJob>
+				<CleanUpPool>false</CleanUpPool>
+				<ServiceName>Voltage-Service</ServiceName>
+				<Operation>
+						both
+						<!-- encrypt -->
+						<!-- decrypt -->
+				</Operation>
+        </Config>        
+</batch-service-utility>

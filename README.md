@@ -38,7 +38,7 @@ Resource gets created from startup resource
 - command to run from ADF /bin/bash -c "java -cp /mnt/batch/tasks/startup/wd/AzureBatchService-1.0.0-jar-with-dependencies.jar AzureBatchService"
 
 Set Command to run Executable JAR while creating a Tak
--  .withCommandLine("java -cp boots-voltage-fle-utility-0.0.1-jar-with-dependencies.jar main.java.com.boots.voltage.VoltageMainApplication \"voltage_service_config_01.xml\"")
+-  .withCommandLine("java -cp boots-voltage-fle-utility-0.0.1-jar-with-dependencies.jar com.boots.voltage.VoltageMainApplication \"voltage_service_config_01.xml\" null")
 
 Clone repo and compile the code:
 

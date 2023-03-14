@@ -1,6 +1,8 @@
 package azbatch.constants;
 
-public class AzBatchConfig {    
+public class AzBatchConfig {
+
+    
 
 
     /* Configuration for perosonal subscription */

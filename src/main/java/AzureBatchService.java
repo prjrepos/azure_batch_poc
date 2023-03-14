@@ -5,6 +5,7 @@ import java.util.*;
 import java.util.concurrent.TimeoutException;
 import azbatch.constants.AzBatchConfig;
 import azbatch.utils.AzBatchUtilities;
+import azbatch.utils.BatchConfigUtil;
 import com.microsoft.azure.storage.*;
 import com.microsoft.azure.storage.blob.*;
 import com.microsoft.azure.batch.*;
@@ -22,6 +23,7 @@ public class AzureBatchService {
     static boolean CLEANUP_JOB = true;
     // warning: Skipping pool deletion will greatly speed up subsequent runs
     static boolean CLEANUP_POOL = false;
+    static Map<String, String> ConfigMap = new HashMap<String, String>();
 
     /**
      * Method to read create Pool, assign node into Pool, create Job, create task
@@ -37,13 +39,14 @@ public class AzureBatchService {
 
     public static void main(String[] argv) throws Exception {
 
+        ConfigMap = BatchConfigUtil.readConfigXML(argv[0]);
         // Get Batch and storage account information from environment
         String BATCH_ACCOUNT = AzBatchConfig.BATCH_ACCOUNT;
         String BATCH_ACCESS_KEY = AzBatchConfig.BATCH_ACCESS_KEY;
         String BATCH_URI = AzBatchConfig.BATCH_URI;
-
         BatchClient client = BatchClient
                 .open(new BatchSharedKeyCredentials(BATCH_URI, BATCH_ACCOUNT, BATCH_ACCESS_KEY));
+
         CloudBlobContainer container = createBlobContainerIfNotExists();
        
         String svcName = "Voltage-Service";

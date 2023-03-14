@@ -1,3 +1,4 @@
 azbatch\utils\AzBatchUtilities.class
 AzureBatchService.class
+azbatch\utils\BatchConfigUtil.class
 azbatch\constants\AzBatchConfig.class

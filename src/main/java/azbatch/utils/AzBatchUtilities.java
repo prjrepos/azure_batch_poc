@@ -1,7 +1,5 @@
 package azbatch.utils;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.security.InvalidKeyException;
@@ -16,8 +14,6 @@ import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import javax.lang.model.util.ElementScanner6;
-
 import java.time.Duration;
 import com.microsoft.azure.batch.BatchClient;
 import com.microsoft.azure.batch.DetailLevel;
@@ -29,9 +25,6 @@ import com.microsoft.azure.batch.protocol.models.ComputeNode;
 import com.microsoft.azure.batch.protocol.models.ImageInformation;
 import com.microsoft.azure.batch.protocol.models.ImageReference;
 import com.microsoft.azure.batch.protocol.models.OSType;
-import com.microsoft.azure.batch.protocol.models.OutputFile;
-import com.microsoft.azure.batch.protocol.models.OutputFileBlobContainerDestination;
-import com.microsoft.azure.batch.protocol.models.OutputFileDestination;
 import com.microsoft.azure.batch.protocol.models.PoolInformation;
 import com.microsoft.azure.batch.protocol.models.PoolState;
 import com.microsoft.azure.batch.protocol.models.ResourceFile;
@@ -213,7 +206,7 @@ public class AzBatchUtilities {
                     .withId("voltage-batch-task" + i)
                     .withCommandLine(
                             //"java -cp batchdemo-1.0-jar-with-dependencies.jar main.java.com.sample.testapp.App \"batchdemo_config.xml\""
-                            "java -cp boots-voltage-fle-utility-0.0.1-jar-with-dependencies.jar main.java.com.boots.voltage.VoltageMainApplication \"voltage_service_config_01.xml\""
+                            "java -cp boots-voltage-fle-utility-0.0.1-jar-with-dependencies.jar  com.boots.voltage.VoltageMainApplication \"voltage_service_config_01.xml\" both"
                     )
                     .withResourceFiles(files)
                     //.withOutputFiles(logfiles)
