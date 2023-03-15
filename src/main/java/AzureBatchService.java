@@ -1,12 +1,11 @@
 import java.io.*;
-import java.net.URISyntaxException;
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.TimeoutException;
 import azbatch.constants.AzBatchConfig;
 import azbatch.utils.AzBatchUtilities;
 import azbatch.utils.BatchConfigUtil;
-import com.microsoft.azure.storage.*;
+import azbatch.utils.StorageUtil;
 import com.microsoft.azure.storage.blob.*;
 import com.microsoft.azure.batch.*;
 import com.microsoft.azure.batch.auth.*;
@@ -20,8 +19,7 @@ public class AzureBatchService {
     
    
     static boolean CLEANUP_STORAGE_CONTAINER = false;
-    static boolean CLEANUP_JOB = true;
-    // warning: Skipping pool deletion will greatly speed up subsequent runs
+    static boolean CLEANUP_JOB = true;    
     static boolean CLEANUP_POOL = false;
     static Map<String, String> ConfigMap = new HashMap<String, String>();
 
@@ -40,19 +38,19 @@ public class AzureBatchService {
     public static void main(String[] argv) throws Exception {
 
         ConfigMap = BatchConfigUtil.readConfigXML(argv[0]);
-        // Get Batch and storage account information from environment
-        String BATCH_ACCOUNT = AzBatchConfig.BATCH_ACCOUNT;
-        String BATCH_ACCESS_KEY = AzBatchConfig.BATCH_ACCESS_KEY;
-        String BATCH_URI = AzBatchConfig.BATCH_URI;
+        
+        // Get Batch and storage account information from environment        
+        String BATCH_ACCOUNT = ConfigMap.get("BATCH_ACCOUNT");
+        String BATCH_ACCESS_KEY = ConfigMap.get("BATCH_ACCESS_KEY");
+        String BATCH_URI = ConfigMap.get("BATCH_URI");
         BatchClient client = BatchClient
                 .open(new BatchSharedKeyCredentials(BATCH_URI, BATCH_ACCOUNT, BATCH_ACCESS_KEY));
 
-        CloudBlobContainer container = createBlobContainerIfNotExists();
+        CloudBlobContainer container = StorageUtil.createBlobContainerIfNotExists(ConfigMap);
        
-        String svcName = "Voltage-Service";
-       
-        String poolId = AzBatchConfig.POOL_ID;
-        String jobId = "AzBatchJob-" + svcName + "-" +
+        String svcName = ConfigMap.get("SERVICE_NAME");       
+        String poolId = ConfigMap.get("POOL_ID");
+        String jobId = "azbatchjob-" + svcName + "-" +
                 new Date().toString().replaceAll("(\\.|:|\\s)", "-");
         try {
             //CloudPool sharedPool = AzBatchUtilities.createPoolIfNotExists(client);
@@ -91,7 +89,7 @@ public class AzureBatchService {
             ex.printStackTrace();
         } finally {
             // Clean up resources
-            if (CLEANUP_JOB) {
+            if (Boolean.parseBoolean(ConfigMap.get("CLEANUP_JOB"))) {
                 try {
                     logger.info("Deleting job " + jobId);
                     client.jobOperations().deleteJob(jobId);
@@ -99,7 +97,7 @@ public class AzureBatchService {
                     printBatchException(err);
                 }
             }
-            if (CLEANUP_POOL) {
+            if (Boolean.parseBoolean(ConfigMap.get("CLEANUP_POOL"))) {
                 try {
                     logger.info("Deleting pool " + poolId);
                     client.poolOperations().deletePool(poolId);
@@ -107,7 +105,7 @@ public class AzureBatchService {
                     printBatchException(err);
                 }
             }
-            if (CLEANUP_STORAGE_CONTAINER) {
+            if (Boolean.parseBoolean(ConfigMap.get("CLEANUP_STORAGE_CONTAINER"))) {
                 logger.info("Deleting storage container " + container.getName());
                 container.deleteIfExists();
             }
@@ -115,28 +113,6 @@ public class AzureBatchService {
 
         logger.info("\nFinished");
         System.exit(0);
-    }
-
-    /**
-     * Create blob container in order to upload file
-     * 
-     * @param storageAccountName The name of the storage account to create or lookup
-     * @param storageAccountKey  An SAS key for accessing the storage account
-     * @return A newly created or existing storage container
-     */
-
-    private static CloudBlobContainer createBlobContainerIfNotExists()
-            throws URISyntaxException, StorageException {
-
-        String STORAGE_ACCOUNT_NAME = AzBatchConfig.STORAGE_ACCOUNT_NAME;
-        String STORAGE_ACCOUNT_KEY = AzBatchConfig.STORAGE_ACCOUNT_KEY;
-        String STORAGE_CONTAINER_NAME = AzBatchConfig.STORAGE_CONTAINER_NAME;
-        logger.info("Creating storage container " + STORAGE_CONTAINER_NAME);
-        StorageCredentials credentials = new StorageCredentialsAccountAndKey(STORAGE_ACCOUNT_NAME, STORAGE_ACCOUNT_KEY);
-        CloudBlobClient blobClient = new CloudStorageAccount(credentials, true).createCloudBlobClient();
-        CloudBlobContainer container = blobClient.getContainerReference(STORAGE_CONTAINER_NAME);
-        container.createIfNotExists();
-        return container;
     }
     
     private static void printBatchException(BatchErrorException err) {

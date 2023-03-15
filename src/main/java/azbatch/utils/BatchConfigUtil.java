@@ -41,12 +41,43 @@ public class BatchConfigUtil {
             Element cElem = (Element) cNode;
             map.put("STORAGE_ACCOUNT_NAME", cElem.getElementsByTagName("StorageAccountName").item(0).getTextContent());
             map.put("STORAGE_ACCOUNT_KEY", cElem.getElementsByTagName("StorageAccountKey").item(0).getTextContent());
-            map.put("STORAGE_CONTAINER_NAME", cElem.getElementsByTagName("StorageContainerName").item(0).getTextContent());         
+            map.put("STORAGE_CONTAINER_NAME", cElem.getElementsByTagName("StorageContainerName").item(0).getTextContent());
+            map.put("BATCH_ACCOUNT", cElem.getElementsByTagName("BatchAccountName").item(0).getTextContent());
+            map.put("BATCH_ACCESS_KEY", cElem.getElementsByTagName("BatchAccessKey").item(0).getTextContent());  
+            map.put("BATCH_URI", cElem.getElementsByTagName("BatchUri").item(0).getTextContent());
+            map.put("APP_METADATA_DIR", cElem.getElementsByTagName("AppMetdataDirectory").item(0).getTextContent());
+            map.put("POOL_ID", cElem.getElementsByTagName("PoolId").item(0).getTextContent());
+            map.put("TASK_COUNT", cElem.getElementsByTagName("TaskCount").item(0).getTextContent());
+            map.put("NODE_COUNT", cElem.getElementsByTagName("NodeCount").item(0).getTextContent());
+            map.put("OS_PUBLISHER", cElem.getElementsByTagName("OSPublisher").item(0).getTextContent()); 
+            map.put("OS_OFFER", cElem.getElementsByTagName("OSOffer").item(0).getTextContent()); 
+            map.put("POOL_VM_SIZE", cElem.getElementsByTagName("PoolVmSize").item(0).getTextContent()); 
+            map.put("POOL_VM_COUNT", cElem.getElementsByTagName("PoolVmCount").item(0).getTextContent());
+            map.put("CLEANUP_STORAGE_CONTAINER", cElem.getElementsByTagName("CleanUpStorage").item(0).getTextContent());
+            map.put("CLEANUP_JOB", cElem.getElementsByTagName("CleanUpJob").item(0).getTextContent());
+            map.put("CLEANUP_POOL", cElem.getElementsByTagName("CleanUpPool").item(0).getTextContent());
+            map.put("SERVICE_NAME", cElem.getElementsByTagName("ServiceName").item(0).getTextContent());
+            map.put("VOLTAGE_OPERATION", cElem.getElementsByTagName("Operation").item(0).getTextContent());            
 
             logger.info("************** Batch Configurations  *************************");
-            logger.info("Storage Account Name 	:" + map.get("STORAGE_ACCOUNT_NAME"));
-            logger.info("Storge Container Name 	:" + map.get("STORAGE_CONTAINER_NAME"));          
-            logger.info("*******************************************************************");       
+            logger.info("Storage Account Name 	    : " + map.get("STORAGE_ACCOUNT_NAME"));
+            logger.info("Storge Container Name 	    : " + map.get("STORAGE_CONTAINER_NAME"));
+            logger.info("Batch Account Name 	    : " + map.get("BATCH_ACCOUNT"));
+            logger.info("Batch URI 	                : " + map.get("BATCH_URI"));
+            logger.info("Application Metdata Dir    : " + map.get("APP_METADATA_DIR"));
+            logger.info("Pool Id                    : " + map.get("POOL_ID"));
+            logger.info("Task Count                 : " + map.get("TASK_COUNT"));
+            logger.info("Node Count                 : " + map.get("NODE_COUNT"));
+            logger.info("OS Publisher               : " + map.get("OS_PUBLISHER"));
+            logger.info("OS Offer                   : " + map.get("OS_OFFER"));
+            logger.info("Node Count                 : " + map.get("POOL_VM_SIZE"));
+            logger.info("Node Count                 : " + map.get("POOL_VM_COUNT"));
+            logger.info("Cleanup Storage Flag       : " + map.get("CLEANUP_STORAGE_CONTAINER"));
+            logger.info("Cleanup Job Flag           : " + map.get("CLEANUP_JOB"));
+            logger.info("Cleanup Pool Flag          : " + map.get("CLEANUP_POOL"));
+            logger.info("Service Name               : " + map.get("SERVICE_NAME"));
+            logger.info("Voltage Operation          : " + map.get("VOLTAGE_OPERATION")); 
+            logger.info("**************************************************************");       
 
         } catch (IOException ioe) {
             logger.info("Failed [readConfigXML]: " + ioe.getMessage());

@@ -1,4 +1,5 @@
-C:\workspaces_CEP\repo-azure-poc\java_azure_batch\src\main\java\azbatch\utils\BatchConfigUtil.java
-C:\workspaces_CEP\repo-azure-poc\java_azure_batch\src\main\java\azbatch\utils\AzBatchUtilities.java
-C:\workspaces_CEP\repo-azure-poc\java_azure_batch\src\main\java\azbatch\constants\AzBatchConfig.java
-C:\workspaces_CEP\repo-azure-poc\java_azure_batch\src\main\java\AzureBatchService.java
+/home/prasenjit/dev-workspace/ws-azure-java/java_azure_batch/src/main/java/AzureBatchService.java
+/home/prasenjit/dev-workspace/ws-azure-java/java_azure_batch/src/main/java/azbatch/constants/AzBatchConfig.java
+/home/prasenjit/dev-workspace/ws-azure-java/java_azure_batch/src/main/java/azbatch/utils/StorageUtil.java
+/home/prasenjit/dev-workspace/ws-azure-java/java_azure_batch/src/main/java/azbatch/utils/BatchConfigUtil.java
+/home/prasenjit/dev-workspace/ws-azure-java/java_azure_batch/src/main/java/azbatch/utils/AzBatchUtilities.java

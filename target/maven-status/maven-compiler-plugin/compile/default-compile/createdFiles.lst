@@ -1,4 +1,5 @@
-azbatch\utils\AzBatchUtilities.class
 AzureBatchService.class
-azbatch\utils\BatchConfigUtil.class
-azbatch\constants\AzBatchConfig.class
+azbatch/utils/AzBatchUtilities.class
+azbatch/constants/AzBatchConfig.class
+azbatch/utils/BatchConfigUtil.class
+azbatch/utils/StorageUtil.class

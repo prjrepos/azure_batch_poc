@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <batch-service-utility>
         <Config>                
-               
+				<BatchAccountName>azurebatchpoc</BatchAccountName>
+				<BatchAccessKey>PmWnRbeONXqgkCudDA1JKSnUrhHAGu7XmXvmoRy0suOL/lw2KABzYUVb8hHFyaZ8e7OA8SYO7Ynf+ABanSsE7g==</BatchAccessKey>
+				<BatchUri>https://azurebatchpoc.uksouth.batch.azure.com</BatchUri>
                 <StorageAccountName>samplepoc2022</StorageAccountName>
                 <StorageAccountKey>gF/wMAN3w28a/HBI8hU6PRb00mHb+gUzWOLyae8n5Ss34P9rsrfgg/vaY/+aan0/QhtY/pVMDsUT+AStqT2Jog==</StorageAccountKey>
-                <StorageContainerName>azure-batch-storage</StorageContainerName>
-                <RawDataDirectory>azbatch-voltage-data/inbound</RawDataDirectory>
-                <EncryptedDataDirectory>azbatch-voltage-data/encrypted_import</EncryptedDataDirectory>
-                <DecryptedDataDirectory>azbatch-voltage-data/decrypted_export</DecryptedDataDirectory>
+                <StorageContainerName>azure-batch-storage</StorageContainerName>               
 				<AppMetdataDirectory>azbatch-voltage-metadata</AppMetdataDirectory>
 				<PoolId>devceployaba01-pool-01</PoolId>
 				<TaskCount>1</TaskCount>
@@ -18,12 +17,11 @@
 				<PoolVmCount>1</PoolVmCount>
 				<CleanUpStorage>false</CleanUpStorage>
 				<CleanUpJob>true</CleanUpJob>
+				<!-- warning: Skipping pool deletion will greatly speed up subsequent runs -->
 				<CleanUpPool>false</CleanUpPool>
-				<ServiceName>Voltage-Service</ServiceName>
-				<Operation>
-						both
-						<!-- encrypt -->
-						<!-- decrypt -->
-				</Operation>
+				<ServiceName>voltage-service</ServiceName>
+				<Operation>both</Operation>
+				<!-- <Operation>encrypt</Operation> -->
+				<!-- <Operation>decrypt</Operation> -->
         </Config>        
 </batch-service-utility>
