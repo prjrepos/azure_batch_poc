@@ -4,10 +4,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.security.InvalidKeyException;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -34,15 +31,9 @@ import com.microsoft.azure.batch.protocol.models.VerificationType;
 import com.microsoft.azure.batch.protocol.models.VirtualMachineConfiguration;
 import com.microsoft.azure.storage.StorageException;
 import com.microsoft.azure.storage.blob.CloudBlobContainer;
-import com.microsoft.azure.storage.blob.CloudBlobDirectory;
-import com.microsoft.azure.storage.blob.CloudBlockBlob;
-import com.microsoft.azure.storage.blob.ListBlobItem;
-import com.microsoft.azure.storage.blob.SharedAccessBlobPermissions;
-import com.microsoft.azure.storage.blob.SharedAccessBlobPolicy;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import azbatch.constants.AzBatchConfig;
+
 
 public class AzBatchUtilities {
 
@@ -56,16 +47,16 @@ public class AzBatchUtilities {
      *
      * @return A newly created or existing pool
      */
-    public static CloudPool createPoolIfNotExists(BatchClient client)
+    public static CloudPool createPoolIfNotExists(BatchClient client, Map<String,String> map)
             throws BatchErrorException, IllegalArgumentException, IOException, InterruptedException, TimeoutException {
 
         // Create a pool with 1 A1 VM
-        String osPublisher = AzBatchConfig.OS_PUBLISHER;
-        String osOffer = AzBatchConfig.OS_OFFER;
-        String poolVMSize = AzBatchConfig.POOL_VM_SIZE;
-        String poolId = AzBatchConfig.POOL_ID;
-        int poolVMCount = AzBatchConfig.POOL_VM_COUNT;
-        int NODE_COUNT = AzBatchConfig.NODE_COUNT;
+        String osPublisher = map.get("OS_PUBLISHER");
+        String osOffer = map.get("OS_OFFER");
+        String poolVMSize = map.get("POOL_VM_SIZE");
+        String poolId = map.get("POOL_ID");
+        int poolVMCount = Integer.parseInt(map.get("POOL_VM_COUNT"));
+        int NODE_COUNT = Integer.parseInt(map.get("NODE_COUNT"));
         Duration poolSteadyTimeout = Duration.ofMinutes(5);
         Duration vmReadyTimeout = Duration.ofMinutes(20);
 
@@ -98,6 +89,7 @@ public class AzBatchUtilities {
             }
             // Use IaaS VM with Linux
             VirtualMachineConfiguration configuration = new VirtualMachineConfiguration();
+            
             configuration
                     .withNodeAgentSKUId(skuId)
                     .withImageReference(imageRef);
@@ -164,10 +156,11 @@ public class AzBatchUtilities {
      * @param jobId     A unique ID for the new job
      * @param taskCount How many tasks to add
      */
-    public static void submitJob(BatchClient client, CloudBlobContainer container, String poolId, String jobId)
+    public static void submitJob(BatchClient client, CloudBlobContainer container, String poolId, String jobId, Map<String,String> map)
             throws BatchErrorException, IOException, StorageException, InvalidKeyException, InterruptedException,
             URISyntaxException {
-        int taskCount = AzBatchConfig.TASK_COUNT;       
+        
+        int taskCount = Integer.parseInt(map.get("TASK_COUNT"));       
         logger.info("Submitting job " + jobId + " with " + taskCount + " tasks");
 
         // Create job
@@ -175,22 +168,21 @@ public class AzBatchUtilities {
         poolInfo.withPoolId(poolId);
         client.jobOperations().createJob(jobId, poolInfo);
         
-        //download application configuration files for the execution
-        //String[] appfiles = { "batchdemo-1.0-jar-with-dependencies.jar", "batchdemo_config.xml" };
+        //download application configuration files for the execution        
         String[] appfiles = { "boots-voltage-fle-utility-0.0.1-jar-with-dependencies.jar", "voltage_service_config_01.xml" };
         List<ResourceFile> files = new ArrayList<>();
         for (String fileName : appfiles) {
             String localPath = "./" + fileName;
-            String signedUrl = getAppStorageUri(container, "apps", fileName);
+            String signedUrl = StorageUtil.getAppStorageUri(container, "apps", fileName, map);
             files.add(new ResourceFile()
                     .withHttpUrl(signedUrl)                  
                     .withFilePath(localPath));
         }
 
-        //download application metadata folders & files for the Voltage operation
+        //download application metadata folder for the Voltage operation
         String[] appfolders = { "trustStore"};
         for (String folder : appfolders) {
-            Map<String, String> signedUrls = getAppStorageUri(container, folder);
+            Map<String, String> signedUrls = StorageUtil.getAppStorageUri(container, folder, map);
             for (Entry<String, String> entry : signedUrls.entrySet()) {
                 String localPath = folder + "/" + entry.getKey();                
                 files.add(new ResourceFile()
@@ -205,83 +197,14 @@ public class AzBatchUtilities {
             tasks.add(new TaskAddParameter()
                     .withId("voltage-batch-task" + i)
                     .withCommandLine(
-                            //"java -cp batchdemo-1.0-jar-with-dependencies.jar main.java.com.sample.testapp.App \"batchdemo_config.xml\""
-                            "java -cp boots-voltage-fle-utility-0.0.1-jar-with-dependencies.jar  com.boots.voltage.VoltageMainApplication \"voltage_service_config_01.xml\" both"
-                    )
+                            "java -cp boots-voltage-fle-utility-0.0.1-jar-with-dependencies.jar  com.boots.voltage.VoltageMainApplication \"voltage_service_config_01.xml\" both")
                     .withResourceFiles(files)
                     //.withOutputFiles(logfiles)
                     );
         }
         // Add the tasks to the job
         client.taskOperations().createTasks(jobId, tasks);
-    }
-
-    /**
-     * Get SAS key of the application files to be downloaded
-     *
-     * @param container The container from download
-     * @param dir    The remote directory to download
-     * @param source    The remote file to download
-     *
-     * @return A SAS key for the file
-     */
-    private static String getAppStorageUri(CloudBlobContainer container, String dir, String file)
-            throws URISyntaxException, IOException, InvalidKeyException, StorageException {
-
-        CloudBlobDirectory blobDir = null;
-        blobDir = container.getDirectoryReference(AzBatchConfig.APP_METADATA_FOLDER + "/" + dir);            
-            
-        CloudBlockBlob blob = blobDir.getBlockBlobReference(file);      
-        // Set SAS expiry time to 1 day from now
-        SharedAccessBlobPolicy policy = new SharedAccessBlobPolicy();
-        EnumSet<SharedAccessBlobPermissions> perEnumSet = EnumSet.of(SharedAccessBlobPermissions.READ);
-        policy.setPermissions(perEnumSet);
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(new Date());
-        cal.add(Calendar.DATE, 1);
-        policy.setSharedAccessExpiryTime(cal.getTime());
-        // Create SAS key
-        String sas = blob.generateSharedAccessSignature(policy, null);       
-        return blob.getUri() + "?" + sas;
-    }
-
-    /**
-     * Get SAS key of all files to be downloaded from a Blob Directory
-     *
-     * @param container The container from download
-     * @param dir    The remote directory to download
-     *
-     * @return A SAS key for the file
-     */
-    private static Map<String, String> getAppStorageUri(CloudBlobContainer container, String dir)
-            throws URISyntaxException, IOException, InvalidKeyException, StorageException {
-
-        Map<String, String> map = new HashMap<String, String>();       
-        CloudBlobDirectory blobDir = null;        
-        blobDir = container.getDirectoryReference(AzBatchConfig.APP_METADATA_FOLDER + "/" + dir);
-               
-        Iterable<ListBlobItem> blobs = blobDir.listBlobs();        
-        for (ListBlobItem blob : blobs) {
-            if (blob instanceof CloudBlobDirectory) {
-                continue;                
-            }
-            String path = blob.getUri().getPath();
-            String file = path.substring(path.lastIndexOf("/") + 1);          
-            CloudBlockBlob blockBlob = blobDir.getBlockBlobReference(file);
-            // Set SAS expiry time to 1 day from now
-            SharedAccessBlobPolicy policy = new SharedAccessBlobPolicy();
-            EnumSet<SharedAccessBlobPermissions> perEnumSet = EnumSet.of(SharedAccessBlobPermissions.READ);
-            policy.setPermissions(perEnumSet);
-            Calendar cal = Calendar.getInstance();
-            cal.setTime(new Date());
-            cal.add(Calendar.DATE, 1);
-            policy.setSharedAccessExpiryTime(cal.getTime());
-            // Create SAS key
-            String sas = blockBlob.generateSharedAccessSignature(policy, null);
-            map.put(file, blob.getUri() + "?" + sas);
-        }         
-        return map;
-    }    
+    } 
     
 
     /**

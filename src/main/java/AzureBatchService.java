@@ -2,7 +2,6 @@ import java.io.*;
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.TimeoutException;
-import azbatch.constants.AzBatchConfig;
 import azbatch.utils.AzBatchUtilities;
 import azbatch.utils.BatchConfigUtil;
 import azbatch.utils.StorageUtil;
@@ -15,12 +14,7 @@ import org.apache.logging.log4j.Logger;
 
 public class AzureBatchService {
 
-    private static final Logger logger = LogManager.getLogger(AzureBatchService.class);
-    
-   
-    static boolean CLEANUP_STORAGE_CONTAINER = false;
-    static boolean CLEANUP_JOB = true;    
-    static boolean CLEANUP_POOL = false;
+    private static final Logger logger = LogManager.getLogger(AzureBatchService.class);  
     static Map<String, String> ConfigMap = new HashMap<String, String>();
 
     /**
@@ -53,10 +47,10 @@ public class AzureBatchService {
         String jobId = "azbatchjob-" + svcName + "-" +
                 new Date().toString().replaceAll("(\\.|:|\\s)", "-");
         try {
-            //CloudPool sharedPool = AzBatchUtilities.createPoolIfNotExists(client);
+            //CloudPool sharedPool = AzBatchUtilities.createPoolIfNotExists(client, ConfigMap);
             CloudPool sharedPool = client.poolOperations().getPool(poolId);
             // Submit a job and wait for completion
-            AzBatchUtilities.submitJob(client, container, sharedPool.id(), jobId);
+            AzBatchUtilities.submitJob(client, container, sharedPool.id(), jobId, ConfigMap);
             AzBatchUtilities.waitForTasksToComplete(client, jobId, Duration.ofMinutes(5));
             logger.info("\nTask Results");
             logger.info("------------------------------------------------------");
