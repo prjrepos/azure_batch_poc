@@ -35,10 +35,10 @@ Install JRE on Pool Node Startup
 Resource gets created from startup resource
 - CentOS "/mnt/resource/batch/tasks/startup/wd"
 - Ubuntu "/mnt/batch/tasks/startup/wd/"  
-- command to run from ADF /bin/bash -c "java -cp /mnt/batch/tasks/startup/wd/AzureBatchService-1.0.0-jar-with-dependencies.jar AzureBatchService"
+- command to run from ADF /bin/bash -c "java -cp /mnt/batch/tasks/startup/wd/AzureBatchService-1.0.0-jar-with-dependencies.jar AzureBatchService "/mnt/batch/tasks/startup/wd/batch_service_config_01.xml""
 
 Set Command to run Executable JAR while creating a Tak
--  .withCommandLine("java -cp boots-voltage-fle-utility-0.0.1-jar-with-dependencies.jar com.boots.voltage.VoltageMainApplication \"voltage_service_config_01.xml\" null")
+-  .withCommandLine("java -cp boots-voltage-fle-utility-0.0.1-jar-with-dependencies.jar com.boots.voltage.VoltageMainApplication \"voltage_service_config_01.xml\" both")
 
 Clone repo and compile the code:
 

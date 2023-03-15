@@ -197,7 +197,7 @@ public class AzBatchUtilities {
             tasks.add(new TaskAddParameter()
                     .withId("voltage-batch-task" + i)
                     .withCommandLine(
-                            "java -cp boots-voltage-fle-utility-0.0.1-jar-with-dependencies.jar  com.boots.voltage.VoltageMainApplication \"voltage_service_config_01.xml\" both")
+                            "java -cp boots-voltage-fle-utility-0.0.1-jar-with-dependencies.jar com.boots.voltage.VoltageMainApplication \"voltage_service_config_01.xml\" both")
                     .withResourceFiles(files)
                     //.withOutputFiles(logfiles)
                     );
