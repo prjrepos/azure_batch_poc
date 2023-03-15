@@ -9,6 +9,7 @@ import com.microsoft.azure.storage.blob.*;
 import com.microsoft.azure.batch.*;
 import com.microsoft.azure.batch.auth.*;
 import com.microsoft.azure.batch.protocol.models.*;
+import com.microsoft.azure.batch.protocol.models.CloudPool;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -47,8 +48,13 @@ public class AzureBatchService {
         String jobId = "azbatchjob-" + svcName + "-" +
                 new Date().toString().replaceAll("(\\.|:|\\s)", "-");
         try {
-            //CloudPool sharedPool = AzBatchUtilities.createPoolIfNotExists(client, ConfigMap);
-            CloudPool sharedPool = client.poolOperations().getPool(poolId);
+            CloudPool sharedPool = null;
+            if(Boolean.parseBoolean(ConfigMap.get("CREATE_POOL")))
+                sharedPool = AzBatchUtilities.createPoolIfNotExists(client, ConfigMap);
+            else{
+                logger.info("Using Existing Pool: " +poolId);
+                sharedPool = client.poolOperations().getPool(poolId);
+            }                
             // Submit a job and wait for completion
             AzBatchUtilities.submitJob(client, container, sharedPool.id(), jobId, ConfigMap);
             AzBatchUtilities.waitForTasksToComplete(client, jobId, Duration.ofMinutes(5));

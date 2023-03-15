@@ -11,6 +11,7 @@
 				<PoolId>devceployaba01-pool-01</PoolId>
 				<TaskCount>1</TaskCount>
 				<NodeCount>1</NodeCount>
+				<CreatePool>false</CreatePool>
 				<OSPublisher>OpenLogic</OSPublisher>
 				<OSOffer>CentOS</OSOffer>
 				<PoolVmSize>Standard_A1_v2</PoolVmSize>
@@ -22,6 +23,6 @@
 				<ServiceName>voltage-service</ServiceName>
 				<Operation>both</Operation>
 				<!-- <Operation>encrypt</Operation> -->
-				<!-- <Operation>decrypt</Operation> -->
+				<!-- <Operation>decrypt</Operation> -->				
         </Config>        
 </batch-service-utility>

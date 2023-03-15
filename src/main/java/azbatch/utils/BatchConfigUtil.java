@@ -57,7 +57,8 @@ public class BatchConfigUtil {
             map.put("CLEANUP_JOB", cElem.getElementsByTagName("CleanUpJob").item(0).getTextContent());
             map.put("CLEANUP_POOL", cElem.getElementsByTagName("CleanUpPool").item(0).getTextContent());
             map.put("SERVICE_NAME", cElem.getElementsByTagName("ServiceName").item(0).getTextContent());
-            map.put("VOLTAGE_OPERATION", cElem.getElementsByTagName("Operation").item(0).getTextContent());            
+            map.put("VOLTAGE_OPERATION", cElem.getElementsByTagName("Operation").item(0).getTextContent());
+            map.put("CREATE_POOL", cElem.getElementsByTagName("CreatePool").item(0).getTextContent());            
 
             logger.info("************** Batch Configurations  *************************");
             logger.info("Storage Account Name 	    : " + map.get("STORAGE_ACCOUNT_NAME"));
@@ -76,7 +77,8 @@ public class BatchConfigUtil {
             logger.info("Cleanup Job Flag           : " + map.get("CLEANUP_JOB"));
             logger.info("Cleanup Pool Flag          : " + map.get("CLEANUP_POOL"));
             logger.info("Service Name               : " + map.get("SERVICE_NAME"));
-            logger.info("Voltage Operation          : " + map.get("VOLTAGE_OPERATION")); 
+            logger.info("Voltage Operation          : " + map.get("VOLTAGE_OPERATION"));
+            logger.info("Create New Pool            : " + map.get("CREATE_POOL"));  
             logger.info("**************************************************************");       
 
         } catch (IOException ioe) {
