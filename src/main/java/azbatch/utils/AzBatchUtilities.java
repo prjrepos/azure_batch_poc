@@ -1,5 +1,7 @@
 package azbatch.utils;
 
+import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.security.InvalidKeyException;
@@ -22,15 +24,21 @@ import com.microsoft.azure.batch.protocol.models.ComputeNode;
 import com.microsoft.azure.batch.protocol.models.ImageInformation;
 import com.microsoft.azure.batch.protocol.models.ImageReference;
 import com.microsoft.azure.batch.protocol.models.OSType;
+import com.microsoft.azure.batch.protocol.models.OutputFile;
+import com.microsoft.azure.batch.protocol.models.OutputFileBlobContainerDestination;
+import com.microsoft.azure.batch.protocol.models.OutputFileDestination;
 import com.microsoft.azure.batch.protocol.models.PoolInformation;
 import com.microsoft.azure.batch.protocol.models.PoolState;
 import com.microsoft.azure.batch.protocol.models.ResourceFile;
+import com.microsoft.azure.batch.protocol.models.StartTask;
 import com.microsoft.azure.batch.protocol.models.TaskAddParameter;
 import com.microsoft.azure.batch.protocol.models.TaskState;
 import com.microsoft.azure.batch.protocol.models.VerificationType;
 import com.microsoft.azure.batch.protocol.models.VirtualMachineConfiguration;
 import com.microsoft.azure.storage.StorageException;
 import com.microsoft.azure.storage.blob.CloudBlobContainer;
+
+import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -86,17 +94,24 @@ public class AzBatchUtilities {
                         }
                     }
                 }
-            }
+            }            
             // Use IaaS VM with Linux
-            VirtualMachineConfiguration configuration = new VirtualMachineConfiguration();
-            
+            VirtualMachineConfiguration configuration = new VirtualMachineConfiguration();            
             configuration
                     .withNodeAgentSKUId(skuId)
                     .withImageReference(imageRef);
-
             client.poolOperations().createPool(poolId, poolVMSize, configuration, poolVMCount);
         }
-
+        //CloudPool pool = client.poolOperations().getPool(poolId);        
+        StartTask poolStartTask = new StartTask();
+        poolStartTask
+            .withCommandLine("/bin/bash -c \"sudo apt-get update&&sudo apt-get install -y openjdk-8-jdk\"")
+            //.withCommandLine("sudo apt-get update&&sudo apt-get install -y openjdk-8-jdk")
+            //.withResourceFiles(null)
+            .withWaitForSuccess(true)
+            .withMaxTaskRetryCount(1);        
+        //pool.withStartTask(poolStartTask);
+        
         long startTime = System.currentTimeMillis();
         long elapsedTime = 0L;
         boolean steady = false;
@@ -106,6 +121,7 @@ public class AzBatchUtilities {
         while (elapsedTime < poolSteadyTimeout.toMillis()) {
             CloudPool pool = client.poolOperations().getPool(poolId);
             if (pool.allocationState() == AllocationState.STEADY) {
+                pool.withStartTask(poolStartTask);
                 steady = true;
                 break;
             }
@@ -191,6 +207,20 @@ public class AzBatchUtilities {
             }
         }
 
+        //uploading log files from nodes to storage
+        File dir = new File(".");
+        FileFilter fileFilter = new WildcardFileFilter("*.log");
+        File[] outfiles = dir.listFiles(fileFilter);       
+        for (File logfile:outfiles){
+            logger.info(logfile.getCanonicalPath());                        
+        }       
+        // List<OutputFile> logfiles = new ArrayList<>();
+        // logfiles.add(new OutputFile()
+        //                 .withDestination(new OutputFileDestination().
+        //                                 .withContainer(new OutputFileBlobContainerDestination()
+        //                                                 .withContainerUrl(jobId)))
+        //                 .withFilePattern("./azure_batch_service*.log"));
+
         // Create tasks
         List<TaskAddParameter> tasks = new ArrayList<>();
         for (int i = 0; i < taskCount; i++) {
@@ -204,7 +234,7 @@ public class AzBatchUtilities {
         }
         // Add the tasks to the job
         client.taskOperations().createTasks(jobId, tasks);
-    } 
+    }   
     
 
     /**

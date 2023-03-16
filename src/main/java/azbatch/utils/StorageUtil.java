@@ -102,7 +102,7 @@ public class StorageUtil {
                
         Iterable<ListBlobItem> blobs = blobDir.listBlobs();        
         for (ListBlobItem blob : blobs) {
-            if (blob instanceof CloudBlobDirectory) {
+            if (blob instanceof CloudBlobDirectory) {           
                 continue;                
             }
             String path = blob.getUri().getPath();
@@ -121,6 +121,35 @@ public class StorageUtil {
             map.put(file, blob.getUri() + "?" + sas);
         }         
         return map;
-    } 
+    }
+
+    //  /**
+    //  * Get SAS key of the application files to be downloaded
+    //  *
+    //  * @param container The container from download
+    //  * @param dir    The remote directory to download
+    //  * @param source    The remote file to download
+    //  *
+    //  * @return A SAS key for the file
+    //  */
+    // public static String getDirStorageUri(CloudBlobContainer container, String dir, Map<String, String> configMap)
+    //         throws URISyntaxException, IOException, InvalidKeyException, StorageException {
+
+    //     CloudBlobDirectory blobDir = null;
+    //     blobDir = container.getDirectoryReference(configMap.get("APP_METADATA_DIR") + "/" + dir);            
+            
+    //     CloudBlockBlob blob = blobDir.getBlockBlobReference(file);      
+    //     // Set SAS expiry time to 1 day from now
+    //     SharedAccessBlobPolicy policy = new SharedAccessBlobPolicy();
+    //     EnumSet<SharedAccessBlobPermissions> perEnumSet = EnumSet.of(SharedAccessBlobPermissions.READ);
+    //     policy.setPermissions(perEnumSet);
+    //     Calendar cal = Calendar.getInstance();
+    //     cal.setTime(new Date());
+    //     cal.add(Calendar.DATE, 1);
+    //     policy.setSharedAccessExpiryTime(cal.getTime());
+    //     // Create SAS key
+    //     String sas = blob.generateSharedAccessSignature(policy, null);       
+    //     return blob.getUri() + "?" + sas;
+    // }
 
 }

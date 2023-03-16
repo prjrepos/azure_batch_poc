@@ -1,28 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <batch-service-utility>
-        <Config>                
-				<BatchAccountName>azurebatchpoc</BatchAccountName>
-				<BatchAccessKey>PmWnRbeONXqgkCudDA1JKSnUrhHAGu7XmXvmoRy0suOL/lw2KABzYUVb8hHFyaZ8e7OA8SYO7Ynf+ABanSsE7g==</BatchAccessKey>
-				<BatchUri>https://azurebatchpoc.uksouth.batch.azure.com</BatchUri>
-                <StorageAccountName>samplepoc2022</StorageAccountName>
-                <StorageAccountKey>gF/wMAN3w28a/HBI8hU6PRb00mHb+gUzWOLyae8n5Ss34P9rsrfgg/vaY/+aan0/QhtY/pVMDsUT+AStqT2Jog==</StorageAccountKey>
-                <StorageContainerName>azure-batch-storage</StorageContainerName>               
-				<AppMetdataDirectory>azbatch-voltage-metadata</AppMetdataDirectory>
-				<PoolId>devceployaba01-pool-01</PoolId>
-				<TaskCount>1</TaskCount>
-				<NodeCount>1</NodeCount>
-				<CreatePool>false</CreatePool>
-				<OSPublisher>OpenLogic</OSPublisher>
-				<OSOffer>CentOS</OSOffer>
-				<PoolVmSize>Standard_A1_v2</PoolVmSize>
-				<PoolVmCount>1</PoolVmCount>
-				<CleanUpStorage>false</CleanUpStorage>
-				<CleanUpJob>true</CleanUpJob>
-				<!-- warning: Skipping pool deletion will greatly speed up subsequent runs -->
-				<CleanUpPool>false</CleanUpPool>
-				<ServiceName>voltage-service</ServiceName>
-				<Operation>both</Operation>
-				<!-- <Operation>encrypt</Operation> -->
-				<!-- <Operation>decrypt</Operation> -->				
-        </Config>        
+	<Config>
+
+		<!-- Configuration for perosonal subscription -->
+		<BatchAccountName>azurebatchpoc</BatchAccountName>
+		<BatchAccessKey>PmWnRbeONXqgkCudDA1JKSnUrhHAGu7XmXvmoRy0suOL/lw2KABzYUVb8hHFyaZ8e7OA8SYO7Ynf+ABanSsE7g==</BatchAccessKey>
+		<BatchUri>https://azurebatchpoc.uksouth.batch.azure.com</BatchUri>
+		<StorageAccountName>samplepoc2022</StorageAccountName>
+		<StorageAccountKey>gF/wMAN3w28a/HBI8hU6PRb00mHb+gUzWOLyae8n5Ss34P9rsrfgg/vaY/+aan0/QhtY/pVMDsUT+AStqT2Jog==</StorageAccountKey>
+		<StorageContainerName>azure-batch-storage</StorageContainerName>
+
+
+		<!-- Common Configuration -->
+		<AppMetdataDirectory>azbatch-voltage-metadata</AppMetdataDirectory>
+		<PoolId>devceployaba01-pool-01</PoolId>
+		<TaskCount>1</TaskCount>
+		<NodeCount>1</NodeCount>
+		<CreatePool>false</CreatePool>
+		<OSPublisher>canonical</OSPublisher>
+		<OSOffer>0001-com-ubuntu-server-focal</OSOffer>
+		<PoolVmSize>Standard_DS1_v2</PoolVmSize>
+		<sku>20_04-lts-gen2</sku>
+		<PoolVmCount>1</PoolVmCount>
+		<CleanUpStorage>false</CleanUpStorage>
+		<CleanUpJob>true</CleanUpJob>
+		<!-- warning: Skipping pool deletion will greatly speed up subsequent runs -->
+		<CleanUpPool>false</CleanUpPool>
+		<ServiceName>voltage-service</ServiceName>
+		<Operation>both</Operation>
+		<!-- <Operation>encrypt</Operation> -->
+		<!-- <Operation>decrypt</Operation> -->
+	</Config>
 </batch-service-utility>

@@ -7,6 +7,7 @@ Java Doc Support link: https://learn.microsoft.com/en-us/java/api/com.microsoft.
 Microsoft Documentation: https://learn.microsoft.com/en-us/azure/batch/batch-technical-overview
 https://learn.microsoft.com/en-us/answers/questions/106667/azure-batch-execute-java-processes
 Stakoverflow updates: https://stackoverflow.com/questions/tagged/azure-batch
+Get Storage Directory SAS token: https://stackoverflow.com/questions/68588894/generate-sas-token-for-a-directory-in-azure-blob-storage-in-python
 
 ## Description
 When run, this sample will:
@@ -35,7 +36,7 @@ Install JRE on Pool Node Startup
 Resource gets created from startup resource
 - CentOS "/mnt/resource/batch/tasks/startup/wd"
 - Ubuntu "/mnt/batch/tasks/startup/wd/"  
-- command to run from ADF /bin/bash -c "java -cp /mnt/batch/tasks/startup/wd/AzureBatchService-1.0.0-jar-with-dependencies.jar AzureBatchService "/mnt/batch/tasks/startup/wd/batch_service_config_01.xml""
+- command to run from ADF /bin/bash -c "sudo java -cp /mnt/batch/tasks/startup/wd/AzureBatchService-1.0.0-jar-with-dependencies.jar AzureBatchService "/mnt/batch/tasks/startup/wd/batch_service_config_01.xml""
 
 Set Command to run Executable JAR while creating a Tak
 -  .withCommandLine("java -cp boots-voltage-fle-utility-0.0.1-jar-with-dependencies.jar com.boots.voltage.VoltageMainApplication \"voltage_service_config_01.xml\" both")
