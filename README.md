@@ -7,7 +7,7 @@ Java Doc Support link: https://learn.microsoft.com/en-us/java/api/com.microsoft.
 Microsoft Documentation: https://learn.microsoft.com/en-us/azure/batch/batch-technical-overview
 https://learn.microsoft.com/en-us/answers/questions/106667/azure-batch-execute-java-processes
 Stakoverflow updates: https://stackoverflow.com/questions/tagged/azure-batch
-Get Storage Directory SAS token: https://stackoverflow.com/questions/68588894/generate-sas-token-for-a-directory-in-azure-blob-storage-in-python
+Get Storage Directory SAS token: https://github.com/Azure/azure-sdk-for-java/blob/main/sdk/storage/azure-storage-file-datalake/src/samples/java/com/azure/storage/file/datalake/FileSystemClientJavaDocCodeSamples.java
 
 ## Description
 When run, this sample will:

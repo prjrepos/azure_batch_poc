@@ -4,7 +4,7 @@
         <Console name="ConsoleAppender" target="SYSTEM_OUT">
             <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
         </Console>
-         <File name="FileAppender" fileName="azure_batch_service-${date:yyyyMMdd}.log">
+         <File name="FileAppender" fileName="/mnt/batch/tasks/startup/wd/azure_batch_service-${date:yyyyMMdd}.log">
             <PatternLayout>
                 <Pattern>%d %p %c{1.} %M [%t] %m%n</Pattern>
             </PatternLayout>

@@ -207,20 +207,13 @@ public class AzBatchUtilities {
             }
         }
 
-        //uploading log files from nodes to storage
-        File dir = new File(".");
-        FileFilter fileFilter = new WildcardFileFilter("*.log");
-        File[] outfiles = dir.listFiles(fileFilter);       
-        for (File logfile:outfiles){
-            logger.info(logfile.getCanonicalPath());                        
-        }       
-        // List<OutputFile> logfiles = new ArrayList<>();
-        // logfiles.add(new OutputFile()
-        //                 .withDestination(new OutputFileDestination().
-        //                                 .withContainer(new OutputFileBlobContainerDestination()
-        //                                                 .withContainerUrl(jobId)))
-        //                 .withFilePattern("./azure_batch_service*.log"));
-
+        //uploading log files from nodes to storage      
+        List<OutputFile> logfiles = new ArrayList<>();
+        logfiles.add(new OutputFile()
+                .withDestination(new OutputFileDestination().withContainer(new OutputFileBlobContainerDestination()
+                        .withContainerUrl(StorageUtil.getStorageDirSasUri(map))))
+                .withFilePattern("/mnt/batch/tasks/startup/wd/azure_batch_service*.log"));
+        
         // Create tasks
         List<TaskAddParameter> tasks = new ArrayList<>();
         for (int i = 0; i < taskCount; i++) {

@@ -46,6 +46,7 @@ public class BatchConfigUtil {
             map.put("BATCH_ACCESS_KEY", cElem.getElementsByTagName("BatchAccessKey").item(0).getTextContent());  
             map.put("BATCH_URI", cElem.getElementsByTagName("BatchUri").item(0).getTextContent());
             map.put("APP_METADATA_DIR", cElem.getElementsByTagName("AppMetdataDirectory").item(0).getTextContent());
+            map.put("APP_LOG_DIR", cElem.getElementsByTagName("AppLogDirectory").item(0).getTextContent());
             map.put("POOL_ID", cElem.getElementsByTagName("PoolId").item(0).getTextContent());
             map.put("TASK_COUNT", cElem.getElementsByTagName("TaskCount").item(0).getTextContent());
             map.put("NODE_COUNT", cElem.getElementsByTagName("NodeCount").item(0).getTextContent());
@@ -66,6 +67,7 @@ public class BatchConfigUtil {
             logger.info("Batch Account Name 	    : " + map.get("BATCH_ACCOUNT"));
             logger.info("Batch URI 	                : " + map.get("BATCH_URI"));
             logger.info("Application Metdata Dir    : " + map.get("APP_METADATA_DIR"));
+            logger.info("Application Log Dir    : " + map.get("APP_LOG_DIR"));
             logger.info("Pool Id                    : " + map.get("POOL_ID"));
             logger.info("Task Count                 : " + map.get("TASK_COUNT"));
             logger.info("Node Count                 : " + map.get("NODE_COUNT"));

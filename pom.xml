@@ -17,16 +17,26 @@
       <artifactId>commons-io</artifactId>
       <version>2.6</version>
     </dependency>
-    <dependency>
+    <!-- <dependency>
       <groupId>com.microsoft.azure</groupId>
       <artifactId>azure-batch</artifactId>
       <version>9.0.0</version>
-    </dependency>
+    </dependency> -->
     <dependency>
+      <groupId>com.microsoft.azure</groupId>
+      <artifactId>azure-batch</artifactId>
+      <version>10.1.0</version>
+  </dependency>
+    <!-- <dependency>
       <groupId>com.microsoft.rest</groupId>
       <artifactId>client-runtime</artifactId>
       <version>1.7.12</version>
-    </dependency>
+    </dependency> -->
+    <dependency>
+      <groupId>com.microsoft.rest</groupId>
+      <artifactId>client-runtime</artifactId>
+      <version>1.7.14</version>
+  </dependency>
     <dependency>
       <groupId>com.microsoft.azure</groupId>
       <artifactId>azure-client-runtime</artifactId>
@@ -48,39 +58,54 @@
       <version>2.19.0</version>
     </dependency>
     <dependency>
+      <groupId>com.azure</groupId>
+      <artifactId>azure-storage-file-datalake</artifactId>
+      <version>12.13.3</version>
+    </dependency>
+    <dependency>
+			<groupId>com.azure</groupId>
+			<artifactId>azure-core</artifactId>
+			<version>1.36.0</version>
+		</dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-core</artifactId>
+      <version>2.14.2</version>
+  </dependency>
+    <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-core</artifactId>
       <version>2.19.0</version>
-    </dependency>
-  </dependencies>  
+    </dependency>  
+  </dependencies>
   <build>
-		<sourceDirectory>src/main/java</sourceDirectory>
-		<plugins>
-			<plugin>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.5.1</version>
-				<configuration>
-					<source>1.8</source>
-					<target>1.8</target>
-				</configuration>
-			</plugin>
-			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<version>3.2.0</version>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<goals>
-							<goal>single</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<descriptorRefs>
-						<descriptorRef>jar-with-dependencies</descriptorRef>
-					</descriptorRefs>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
+    <sourceDirectory>src/main/java</sourceDirectory>
+    <plugins>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.5.1</version>
+        <configuration>
+          <source>1.8</source>
+          <target>1.8</target>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>3.2.0</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <descriptorRefs>
+            <descriptorRef>jar-with-dependencies</descriptorRef>
+          </descriptorRefs>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>

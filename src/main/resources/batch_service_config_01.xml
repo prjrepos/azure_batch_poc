@@ -13,6 +13,7 @@
 
 		<!-- Common Configuration -->
 		<AppMetdataDirectory>azbatch-voltage-metadata</AppMetdataDirectory>
+		<AppLogDirectory>azbatch-voltage-data/logs</AppLogDirectory>
 		<PoolId>devceployaba01-pool-01</PoolId>
 		<TaskCount>1</TaskCount>
 		<NodeCount>1</NodeCount>
