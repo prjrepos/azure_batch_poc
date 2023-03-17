@@ -191,7 +191,7 @@ public class AzBatchUtilities {
         List<ResourceFile> files = new ArrayList<>();
         for (String fileName : appfiles) {
             String localPath = "./" + fileName;
-            String signedUrl = StorageUtil.getAppStorageUri(container, "apps", fileName, map);
+            String signedUrl = StorageUtil.getBlobBlockSasUri(container, "apps", fileName, map);
             files.add(new ResourceFile()
                     .withHttpUrl(signedUrl)                  
                     .withFilePath(localPath));
@@ -200,7 +200,7 @@ public class AzBatchUtilities {
         //download application metadata folder for the Voltage operation
         String[] appfolders = { "trustStore"};
         for (String folder : appfolders) {
-            Map<String, String> signedUrls = StorageUtil.getAppStorageUri(container, folder, map);
+            Map<String, String> signedUrls = StorageUtil.getBlobDirSasUri(container, folder, map);
             for (Entry<String, String> entry : signedUrls.entrySet()) {
                 String localPath = folder + "/" + entry.getKey();                
                 files.add(new ResourceFile()
@@ -210,32 +210,24 @@ public class AzBatchUtilities {
         }
 
         //uploading log files from nodes to storage      
-        List<OutputFile> logfiles = new ArrayList<>();        
-        //OutputFileBlobContainerDestination logContainerDest = new OutputFileBlobContainerDestination().withContainerUrl(StorageUtil.getStorageDirSasUri(map));
-        OutputFileBlobContainerDestination logContainerDest = new OutputFileBlobContainerDestination()
-                                                                .withContainerUrl(StorageUtil.getStorageContainerSasUri(map))
-                                                                .withPath(map.get("APP_LOG_DIR"));
-        
-        OutputFileDestination logFileDest = new OutputFileDestination().withContainer(logContainerDest);  
-       
-        OutputFile logfile = null;
+        List<OutputFile> logfiles = new ArrayList<>();       
+        String containerSasUri = StorageUtil.getBlobContainerSasUri(container);
         File dir = new File("/mnt/batch/tasks/startup/wd");
-        FileFilter fileFilter = new WildcardFileFilter("*.log");
+               
+        FileFilter fileFilter = new WildcardFileFilter("azure_batch_*.log");
         File[] log4jfiles = dir.listFiles(fileFilter);
         for (File file : log4jfiles) {
             logger.info("Log File(s) to be moved to Storage: " + file.getCanonicalPath());
-            logfile = new OutputFile()
+            OutputFileBlobContainerDestination logContainerDest = new OutputFileBlobContainerDestination()
+                    .withContainerUrl(containerSasUri)
+                    .withPath(map.get("APP_LOG_DIR")+"/"+file.getName());     
+            OutputFileDestination logFileDest = new OutputFileDestination().withContainer(logContainerDest);            
+            OutputFile logfile = new OutputFile()
                         .withDestination(logFileDest)
                         .withFilePattern(file.getCanonicalPath())
                         .withUploadOptions(new OutputFileUploadOptions().withUploadCondition(OutputFileUploadCondition.TASK_COMPLETION));
             logfiles.add(logfile);
-        }
-        // OutputFile logfile = new OutputFile()
-        //                     .withDestination(logFileDest)
-        //                     //.withFilePattern("%AZ_BATCH_JOB_PREP_WORKING_DIR%/std*.txt")
-        //                     .withFilePattern("/mnt/batch/tasks/startup/wd/*.log")
-        //                     .withUploadOptions(new OutputFileUploadOptions().withUploadCondition(OutputFileUploadCondition.TASK_COMPLETION));
-        // logfiles.add(logfile);
+        }      
 
         // Create tasks
         List<TaskAddParameter> tasks = new ArrayList<>();

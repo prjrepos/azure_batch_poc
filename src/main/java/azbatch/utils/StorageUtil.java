@@ -73,7 +73,7 @@ public class StorageUtil {
      *
      * @return A SAS key for the file
      */
-    public static String getAppStorageUri(CloudBlobContainer container, String dir, String file, Map<String, String> configMap)
+    public static String getBlobBlockSasUri(CloudBlobContainer container, String dir, String file, Map<String, String> configMap)
             throws URISyntaxException, IOException, InvalidKeyException, StorageException {
 
         CloudBlobDirectory blobDir = null;
@@ -101,13 +101,13 @@ public class StorageUtil {
      *
      * @return A SAS key for the file
      */
-    public static Map<String, String> getAppStorageUri(CloudBlobContainer container, String dir, Map<String, String> configMap)
+    public static Map<String, String> getBlobDirSasUri(CloudBlobContainer container, String dir, Map<String, String> configMap)
             throws URISyntaxException, IOException, InvalidKeyException, StorageException {
 
         Map<String, String> map = new HashMap<String, String>();       
         CloudBlobDirectory blobDir = null;        
         blobDir = container.getDirectoryReference(configMap.get("APP_METADATA_DIR") + "/" + dir);
-               
+    
         Iterable<ListBlobItem> blobs = blobDir.listBlobs();        
         for (ListBlobItem blob : blobs) {
             if (blob instanceof CloudBlobDirectory) {           
@@ -131,6 +131,25 @@ public class StorageUtil {
         return map;
     }
 
+    public static String getBlobContainerSasUri(CloudBlobContainer container)
+            throws URISyntaxException, IOException, InvalidKeyException, StorageException {        
+            
+         // Set SAS expiry time to 1 day from now
+        SharedAccessBlobPolicy policy = new SharedAccessBlobPolicy();
+        EnumSet<SharedAccessBlobPermissions> perEnumSet = EnumSet.of(SharedAccessBlobPermissions.CREATE, SharedAccessBlobPermissions.WRITE);
+        policy.setPermissions(perEnumSet);
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(new Date());
+        cal.add(Calendar.DATE, 1);
+        policy.setSharedAccessExpiryTime(cal.getTime());
+        
+        // Create SAS key
+        String sas = container.generateSharedAccessSignature(policy, null);    
+        return container.getUri() + "?" + sas;
+    }
+
+
+
     static private  DataLakeServiceClient GetDataLakeServiceClientByAccountKey(String accountName, String accountKey) {
 
         StorageSharedKeyCredential sharedKeyCredential = new StorageSharedKeyCredential(accountName, accountKey);
@@ -149,7 +168,7 @@ public class StorageUtil {
      *
      * @return A SAS key for the file
      */
-     public static String getStorageDirSasUri(Map<String, String> configMap)
+     public static String getAdlsDirSasUri(Map<String, String> configMap)
              throws URISyntaxException, IOException, InvalidKeyException, StorageException {
 
          DataLakeServiceClient client = GetDataLakeServiceClientByAccountKey(configMap.get("STORAGE_ACCOUNT_NAME"),
@@ -177,7 +196,7 @@ public class StorageUtil {
       *
       * @return A SAS key for the file
       */
-     public static String getStorageContainerSasUri(Map<String, String> configMap)
+     public static String getAdlsCotainerSasUri(Map<String, String> configMap)
              throws URISyntaxException, IOException, InvalidKeyException, StorageException {
 
          DataLakeServiceClient client = GetDataLakeServiceClientByAccountKey(configMap.get("STORAGE_ACCOUNT_NAME"),

@@ -10,11 +10,10 @@
 		<StorageAccountKey>gF/wMAN3w28a/HBI8hU6PRb00mHb+gUzWOLyae8n5Ss34P9rsrfgg/vaY/+aan0/QhtY/pVMDsUT+AStqT2Jog==</StorageAccountKey>
 		<StorageContainerName>azure-batch-storage</StorageContainerName>
 
-		
 
 		<!-- Common Configuration -->
 		<AppMetdataDirectory>azbatch-voltage-metadata</AppMetdataDirectory>
-		<AppLogDirectory>logs</AppLogDirectory>
+		<AppLogDirectory>azbatch-voltage-data/logs</AppLogDirectory>
 		<PoolId>devceployaba01-pool-01</PoolId>
 		<TaskCount>1</TaskCount>
 		<NodeCount>1</NodeCount>
