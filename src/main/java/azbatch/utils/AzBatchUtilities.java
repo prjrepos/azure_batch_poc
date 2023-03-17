@@ -27,6 +27,8 @@ import com.microsoft.azure.batch.protocol.models.OSType;
 import com.microsoft.azure.batch.protocol.models.OutputFile;
 import com.microsoft.azure.batch.protocol.models.OutputFileBlobContainerDestination;
 import com.microsoft.azure.batch.protocol.models.OutputFileDestination;
+import com.microsoft.azure.batch.protocol.models.OutputFileUploadCondition;
+import com.microsoft.azure.batch.protocol.models.OutputFileUploadOptions;
 import com.microsoft.azure.batch.protocol.models.PoolInformation;
 import com.microsoft.azure.batch.protocol.models.PoolState;
 import com.microsoft.azure.batch.protocol.models.ResourceFile;
@@ -208,12 +210,33 @@ public class AzBatchUtilities {
         }
 
         //uploading log files from nodes to storage      
-        List<OutputFile> logfiles = new ArrayList<>();
-        logfiles.add(new OutputFile()
-                .withDestination(new OutputFileDestination().withContainer(new OutputFileBlobContainerDestination()
-                        .withContainerUrl(StorageUtil.getStorageDirSasUri(map))))
-                .withFilePattern("/mnt/batch/tasks/startup/wd/azure_batch_service*.log"));
+        List<OutputFile> logfiles = new ArrayList<>();        
+        //OutputFileBlobContainerDestination logContainerDest = new OutputFileBlobContainerDestination().withContainerUrl(StorageUtil.getStorageDirSasUri(map));
+        OutputFileBlobContainerDestination logContainerDest = new OutputFileBlobContainerDestination()
+                                                                .withContainerUrl(StorageUtil.getStorageContainerSasUri(map))
+                                                                .withPath(map.get("APP_LOG_DIR"));
         
+        OutputFileDestination logFileDest = new OutputFileDestination().withContainer(logContainerDest);  
+       
+        OutputFile logfile = null;
+        File dir = new File("/mnt/batch/tasks/startup/wd");
+        FileFilter fileFilter = new WildcardFileFilter("*.log");
+        File[] log4jfiles = dir.listFiles(fileFilter);
+        for (File file : log4jfiles) {
+            logger.info("Log File(s) to be moved to Storage: " + file.getCanonicalPath());
+            logfile = new OutputFile()
+                        .withDestination(logFileDest)
+                        .withFilePattern(file.getCanonicalPath())
+                        .withUploadOptions(new OutputFileUploadOptions().withUploadCondition(OutputFileUploadCondition.TASK_COMPLETION));
+            logfiles.add(logfile);
+        }
+        // OutputFile logfile = new OutputFile()
+        //                     .withDestination(logFileDest)
+        //                     //.withFilePattern("%AZ_BATCH_JOB_PREP_WORKING_DIR%/std*.txt")
+        //                     .withFilePattern("/mnt/batch/tasks/startup/wd/*.log")
+        //                     .withUploadOptions(new OutputFileUploadOptions().withUploadCondition(OutputFileUploadCondition.TASK_COMPLETION));
+        // logfiles.add(logfile);
+
         // Create tasks
         List<TaskAddParameter> tasks = new ArrayList<>();
         for (int i = 0; i < taskCount; i++) {
@@ -222,7 +245,7 @@ public class AzBatchUtilities {
                     .withCommandLine(
                             "java -cp boots-voltage-fle-utility-0.0.1-jar-with-dependencies.jar com.boots.voltage.VoltageMainApplication \"voltage_service_config_01.xml\" both")
                     .withResourceFiles(files)
-                    //.withOutputFiles(logfiles)
+                    .withOutputFiles(logfiles)
                     );
         }
         // Add the tasks to the job

@@ -168,4 +168,33 @@ public class StorageUtil {
          return directoryClient.getDirectoryUrl() + "?" + sas;
      }
 
+     /**
+      * Get SAS key of the application files to be downloaded
+      *
+      * @param container The container from download
+      * @param dir       The remote directory to download
+      * @param source    The remote file to download
+      *
+      * @return A SAS key for the file
+      */
+     public static String getStorageContainerSasUri(Map<String, String> configMap)
+             throws URISyntaxException, IOException, InvalidKeyException, StorageException {
+
+         DataLakeServiceClient client = GetDataLakeServiceClientByAccountKey(configMap.get("STORAGE_ACCOUNT_NAME"),
+                 configMap.get("STORAGE_ACCOUNT_KEY"));
+         DataLakeFileSystemClient fsclient = client.getFileSystemClient(configMap.get("STORAGE_CONTAINER_NAME"));
+        
+         FileSystemSasPermission permission = new FileSystemSasPermission()
+                 .setWritePermission(true)
+                 .setCreatePermission(true)
+                 .setReadPermission(true);
+         OffsetDateTime expiry = OffsetDateTime.now().plusDays(1);
+         DataLakeServiceSasSignatureValues policy = new DataLakeServiceSasSignatureValues(expiry, permission)
+                 .setStartTime(OffsetDateTime.now());
+         // Create SAS key
+         String sas = fsclient.generateSas(policy);
+         logger.info("Log Container Filesystem Sas Url: " + fsclient.getFileSystemUrl() + "?" + sas);        
+         return fsclient.getFileSystemUrl() + "?" + sas;
+     }
+
 }

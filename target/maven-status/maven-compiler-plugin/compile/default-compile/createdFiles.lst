@@ -1,4 +1,4 @@
+azbatch\utils\AzBatchUtilities.class
 AzureBatchService.class
-azbatch/utils/AzBatchUtilities.class
-azbatch/utils/BatchConfigUtil.class
-azbatch/utils/StorageUtil.class
+azbatch\utils\StorageUtil.class
+azbatch\utils\BatchConfigUtil.class
