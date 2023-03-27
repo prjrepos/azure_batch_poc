@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <batch-service-utility>
 	<Config>
-
 		<!-- Configuration for perosonal subscription -->
 		<BatchAccountName>azurebatchpoc</BatchAccountName>
 		<BatchAccessKey>PmWnRbeONXqgkCudDA1JKSnUrhHAGu7XmXvmoRy0suOL/lw2KABzYUVb8hHFyaZ8e7OA8SYO7Ynf+ABanSsE7g==</BatchAccessKey>
@@ -9,8 +8,6 @@
 		<StorageAccountName>samplepoc2022</StorageAccountName>
 		<StorageAccountKey>gF/wMAN3w28a/HBI8hU6PRb00mHb+gUzWOLyae8n5Ss34P9rsrfgg/vaY/+aan0/QhtY/pVMDsUT+AStqT2Jog==</StorageAccountKey>
 		<StorageContainerName>azure-batch-storage</StorageContainerName>
-
-
 		<!-- Common Configuration -->
 		<AppMetdataDirectory>azbatch-voltage-metadata</AppMetdataDirectory>
 		<AppLogDirectory>azbatch-voltage-data/logs</AppLogDirectory>
