@@ -54,6 +54,8 @@ public class BatchConfigUtil {
             map.put("OS_OFFER", cElem.getElementsByTagName("OSOffer").item(0).getTextContent()); 
             map.put("POOL_VM_SIZE", cElem.getElementsByTagName("PoolVmSize").item(0).getTextContent()); 
             map.put("POOL_VM_COUNT", cElem.getElementsByTagName("PoolVmCount").item(0).getTextContent());
+            map.put("TARGET_DEDICATED_NODE", cElem.getElementsByTagName("TargetDedicatedNode").item(0).getTextContent());
+            map.put("TARGET_LOW_PRIORITY_NODE", cElem.getElementsByTagName("TargetLowPriorityNode").item(0).getTextContent());
             map.put("CLEANUP_STORAGE_CONTAINER", cElem.getElementsByTagName("CleanUpStorage").item(0).getTextContent());
             map.put("CLEANUP_JOB", cElem.getElementsByTagName("CleanUpJob").item(0).getTextContent());
             map.put("CLEANUP_POOL", cElem.getElementsByTagName("CleanUpPool").item(0).getTextContent());
@@ -67,14 +69,16 @@ public class BatchConfigUtil {
             logger.info("Batch Account Name 	    : " + map.get("BATCH_ACCOUNT"));
             logger.info("Batch URI 	                : " + map.get("BATCH_URI"));
             logger.info("Application Metdata Dir    : " + map.get("APP_METADATA_DIR"));
-            logger.info("Application Log Dir    : " + map.get("APP_LOG_DIR"));
+            logger.info("Application Log Dir        : " + map.get("APP_LOG_DIR"));
             logger.info("Pool Id                    : " + map.get("POOL_ID"));
             logger.info("Task Count                 : " + map.get("TASK_COUNT"));
             logger.info("Node Count                 : " + map.get("NODE_COUNT"));
             logger.info("OS Publisher               : " + map.get("OS_PUBLISHER"));
             logger.info("OS Offer                   : " + map.get("OS_OFFER"));
-            logger.info("Node Count                 : " + map.get("POOL_VM_SIZE"));
+            logger.info("VM Size                    : " + map.get("POOL_VM_SIZE"));
             logger.info("Node Count                 : " + map.get("POOL_VM_COUNT"));
+            logger.info("Target Dedicated Node      : " + map.get("TARGET_DEDICATED_NODE"));
+            logger.info("Target Spot Node           : " + map.get("TARGET_LOW_PRIORITY_NODE"));
             logger.info("Cleanup Storage Flag       : " + map.get("CLEANUP_STORAGE_CONTAINER"));
             logger.info("Cleanup Job Flag           : " + map.get("CLEANUP_JOB"));
             logger.info("Cleanup Pool Flag          : " + map.get("CLEANUP_POOL"));

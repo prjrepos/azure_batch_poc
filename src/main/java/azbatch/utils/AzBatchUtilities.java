@@ -66,7 +66,9 @@ public class AzBatchUtilities {
         String poolVMSize = map.get("POOL_VM_SIZE");
         String poolId = map.get("POOL_ID");
         int poolVMCount = Integer.parseInt(map.get("POOL_VM_COUNT"));
-        int NODE_COUNT = Integer.parseInt(map.get("NODE_COUNT"));
+        //int NODE_COUNT = Integer.parseInt(map.get("NODE_COUNT"));
+        int targetDedicatedNode = Integer.parseInt(map.get("TARGET_DEDICATED_NODE"));
+        int targetLowPriorityNode = Integer.parseInt(map.get("TARGET_LOW_PRIORITY_NODE"));
         Duration poolSteadyTimeout = Duration.ofMinutes(5);
         Duration vmReadyTimeout = Duration.ofMinutes(20);
 
@@ -74,7 +76,7 @@ public class AzBatchUtilities {
         if (client.poolOperations().existsPool(poolId)
                 && client.poolOperations().getPool(poolId).state().equals(PoolState.ACTIVE)) {
             logger.info("Pool " + poolId + " already exists: Resizing to " + poolVMCount + " dedicated node(s)");
-            client.poolOperations().resizePool(poolId, NODE_COUNT, 0);
+            client.poolOperations().resizePool(poolId, targetDedicatedNode, targetLowPriorityNode);
         } else {
             logger.info("Creating pool " + poolId + " with " + poolVMCount + " dedicated node(s)");
 
@@ -102,17 +104,18 @@ public class AzBatchUtilities {
             configuration
                     .withNodeAgentSKUId(skuId)
                     .withImageReference(imageRef);
-            client.poolOperations().createPool(poolId, poolVMSize, configuration, poolVMCount);
+            client.poolOperations().createPool(poolId, poolVMSize, configuration, targetDedicatedNode, targetLowPriorityNode);
+            //client.poolOperations().createPool(poolId, poolVMSize, configuration, poolVMCount);
         }
-        //CloudPool pool = client.poolOperations().getPool(poolId);        
+        CloudPool pool = client.poolOperations().getPool(poolId);        
         StartTask poolStartTask = new StartTask();
         poolStartTask
-            .withCommandLine("/bin/bash -c \"sudo apt-get update&&sudo apt-get install -y openjdk-8-jdk\"")
-            //.withCommandLine("sudo apt-get update&&sudo apt-get install -y openjdk-8-jdk")
+            //.withCommandLine("/bin/bash -c \"sudo apt-get update&&sudo apt-get install -y openjdk-8-jdk\"")
+            .withCommandLine("/bin/bash -c sudo apt-get update&&sudo apt-get install -y openjdk-8-jdk")
             //.withResourceFiles(null)
             .withWaitForSuccess(true)
             .withMaxTaskRetryCount(1);        
-        //pool.withStartTask(poolStartTask);
+        pool.withStartTask(poolStartTask);
         
         long startTime = System.currentTimeMillis();
         long elapsedTime = 0L;
@@ -121,7 +124,7 @@ public class AzBatchUtilities {
         // Wait for the VM to be allocated
         System.out.print("Waiting for pool to resize.");
         while (elapsedTime < poolSteadyTimeout.toMillis()) {
-            CloudPool pool = client.poolOperations().getPool(poolId);
+            //CloudPool pool = client.poolOperations().getPool(poolId);
             if (pool.allocationState() == AllocationState.STEADY) {
                 pool.withStartTask(poolStartTask);
                 steady = true;
@@ -212,8 +215,7 @@ public class AzBatchUtilities {
         //uploading log files from nodes to storage      
         List<OutputFile> logfiles = new ArrayList<>();       
         String containerSasUri = StorageUtil.getBlobContainerSasUri(container);
-        File dir = new File("/mnt/batch/tasks/startup/wd");
-               
+        File dir = new File("/mnt/batch/tasks/startup/wd");               
         FileFilter fileFilter = new WildcardFileFilter("azure_batch_*.log");
         File[] log4jfiles = dir.listFiles(fileFilter);
         for (File file : log4jfiles) {

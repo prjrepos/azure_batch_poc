@@ -14,12 +14,14 @@
 		<PoolId>devceployaba01-pool-01</PoolId>
 		<TaskCount>1</TaskCount>
 		<NodeCount>1</NodeCount>
-		<CreatePool>false</CreatePool>
+		<CreatePool>true</CreatePool>
 		<OSPublisher>canonical</OSPublisher>
 		<OSOffer>0001-com-ubuntu-server-focal</OSOffer>
 		<PoolVmSize>Standard_DS1_v2</PoolVmSize>
 		<sku>20_04-lts-gen2</sku>
 		<PoolVmCount>1</PoolVmCount>
+		<TargetDedicatedNode>1</TargetDedicatedNode>
+		<TargetLowPriorityNode>1</TargetLowPriorityNode>
 		<CleanUpStorage>false</CleanUpStorage>
 		<CleanUpJob>true</CleanUpJob>
 		<!-- warning: Skipping pool deletion will greatly speed up subsequent runs -->

@@ -17,7 +17,7 @@
             "mainClass": "AzureBatchService",
             "projectName": "azure-batch-service",
             "args": [
-                "C:/workspaces_CEP/repo-azure-poc/java_azure_batch/src/main/resources/batch_service_config_01.xml"
+                "/home/prasenjit/dev-workspace/ws-azure-java/java_azure_batch/src/main/resources/batch_service_config_01.xml"
             ]
         }
     ]
