@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "AzureBatchService",
+            "request": "launch",
+            "mainClass": "AzureBatchService",
+            "projectName": "AzureBatchService"
+        },
+        {
+            "type": "java",
             "name": "Current File",
             "request": "launch",
             "mainClass": "${file}"

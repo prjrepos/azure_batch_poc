@@ -50,7 +50,7 @@ public class AzureBatchService {
         try {
             CloudPool sharedPool = null;
             if(Boolean.parseBoolean(ConfigMap.get("CREATE_POOL")))
-                sharedPool = AzBatchUtilities.createPoolIfNotExists(client, ConfigMap);
+                sharedPool = AzBatchUtilities.createPoolIfNotExists(client, ConfigMap, container);
             else{
                 logger.info("Using Existing Pool: " +poolId);
                 sharedPool = client.poolOperations().getPool(poolId);

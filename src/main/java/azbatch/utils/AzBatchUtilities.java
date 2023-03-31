@@ -57,10 +57,16 @@ public class AzBatchUtilities {
      *
      * @return A newly created or existing pool
      */
-    public static CloudPool createPoolIfNotExists(BatchClient client, Map<String,String> map)
-            throws BatchErrorException, IllegalArgumentException, IOException, InterruptedException, TimeoutException {
+    public static CloudPool createPoolIfNotExists(BatchClient client, Map<String,String> map, CloudBlobContainer container)
+            throws BatchErrorException, 
+            IllegalArgumentException, 
+            IOException, 
+            InterruptedException, 
+            TimeoutException, 
+            URISyntaxException, StorageException, InvalidKeyException {
 
-        // Create a pool with 1 A1 VM
+        CloudPool pool = null;
+        StartTask poolStartTask = new StartTask();
         String osPublisher = map.get("OS_PUBLISHER");
         String osOffer = map.get("OS_OFFER");
         String poolVMSize = map.get("POOL_VM_SIZE");
@@ -98,29 +104,41 @@ public class AzBatchUtilities {
                         }
                     }
                 }
-            }            
+            }
             // Use IaaS VM with Linux
-            VirtualMachineConfiguration configuration = new VirtualMachineConfiguration();            
+            VirtualMachineConfiguration configuration = new VirtualMachineConfiguration();
             configuration
                     .withNodeAgentSKUId(skuId)
                     .withImageReference(imageRef);
-            client.poolOperations().createPool(poolId, poolVMSize, configuration, targetDedicatedNode, targetLowPriorityNode);
-            //client.poolOperations().createPool(poolId, poolVMSize, configuration, poolVMCount);
-        }
-        CloudPool pool = client.poolOperations().getPool(poolId);        
-        StartTask poolStartTask = new StartTask();
-        poolStartTask
-            //.withCommandLine("/bin/bash -c \"sudo apt-get update&&sudo apt-get install -y openjdk-8-jdk\"")
-            .withCommandLine("/bin/bash -c sudo apt-get update&&sudo apt-get install -y openjdk-8-jdk")
-            //.withResourceFiles(null)
-            .withWaitForSuccess(true)
-            .withMaxTaskRetryCount(1);        
-        pool.withStartTask(poolStartTask);
+
+            // download metadata files needed in each nodes
+            String[] appfiles = { "libvibesimplejava.so" };
+            List<ResourceFile> files = new ArrayList<>();
+            for (String fileName : appfiles) {
+                String localPath = "./" + fileName;
+                String signedUrl = StorageUtil.getBlobBlockSasUri(container, "apps", fileName, map);
+                files.add(new ResourceFile()
+                        .withHttpUrl(signedUrl)
+                        .withFilePath(localPath));
+            }
+            // creating pool start tasks to be performed in each nodes            
+            poolStartTask
+                    .withCommandLine("sudo apt-get update&&sudo apt-get install -y openjdk-8-jdk")
+                    .withResourceFiles(files)
+                    .withWaitForSuccess(true)
+                    .withMaxTaskRetryCount(1);
+
+            client.poolOperations().createPool(poolId, poolVMSize, configuration, targetDedicatedNode,
+                    targetLowPriorityNode);
+            // client.poolOperations().createPool(poolId, poolVMSize, configuration,
+            // poolVMCount);
+            pool = client.poolOperations().getPool(poolId);
+            //pool.withStartTask(poolStartTask);
+        }  
         
         long startTime = System.currentTimeMillis();
         long elapsedTime = 0L;
         boolean steady = false;
-
         // Wait for the VM to be allocated
         System.out.print("Waiting for pool to resize.");
         while (elapsedTime < poolSteadyTimeout.toMillis()) {
