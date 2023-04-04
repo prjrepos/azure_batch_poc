@@ -123,17 +123,18 @@ public class AzBatchUtilities {
             }
             // creating pool start tasks to be performed in each nodes            
             poolStartTask
-                    .withCommandLine("sudo apt-get update&&sudo apt-get install -y openjdk-8-jdk")
+                    .withCommandLine("sudo apt-get update && sudo apt-get install -y openjdk-8-jdk")
                     .withResourceFiles(files)
                     .withWaitForSuccess(true)
-                    .withMaxTaskRetryCount(1);
+                    .withMaxTaskRetryCount(1)
+                    //.withUserIdentity(null)
+                    ;
 
-            client.poolOperations().createPool(poolId, poolVMSize, configuration, targetDedicatedNode,
-                    targetLowPriorityNode);
-            // client.poolOperations().createPool(poolId, poolVMSize, configuration,
-            // poolVMCount);
+            client.poolOperations().createPool(poolId, poolVMSize, configuration, targetDedicatedNode, targetLowPriorityNode);
+            // client.poolOperations().createPool(poolId, poolVMSize, configuration, poolVMCount);
             pool = client.poolOperations().getPool(poolId);
-            //pool.withStartTask(poolStartTask);
+            pool.withStartTask(poolStartTask);
+            
         }  
         
         long startTime = System.currentTimeMillis();
@@ -141,10 +142,8 @@ public class AzBatchUtilities {
         boolean steady = false;
         // Wait for the VM to be allocated
         System.out.print("Waiting for pool to resize.");
-        while (elapsedTime < poolSteadyTimeout.toMillis()) {
-            //CloudPool pool = client.poolOperations().getPool(poolId);
-            if (pool.allocationState() == AllocationState.STEADY) {
-                pool.withStartTask(poolStartTask);
+        while (elapsedTime < poolSteadyTimeout.toMillis()) {         
+            if (pool.allocationState() == AllocationState.STEADY) {           
                 steady = true;
                 break;
             }
