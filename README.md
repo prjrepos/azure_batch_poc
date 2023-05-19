@@ -31,7 +31,7 @@ Set the following environment variables:
 
 Install JRE on Pool Node Startup
 - CentOs: sudo yum -y install java-1.8.0-openjdk
-- Ubuntu: /bin/bash -c "sudo apt-get update&&sudo apt-get install -y openjdk-8-jdk"
+- Ubuntu: /bin/bash -c "sudo apt-get update&&sudo apt-get install -y openjdk-8-jdk" (can use openjdk-11-jdk too)
 
 Resource gets created from startup resource
 - CentOS "/mnt/resource/batch/tasks/startup/wd"

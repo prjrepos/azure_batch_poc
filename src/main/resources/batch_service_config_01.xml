@@ -2,9 +2,9 @@
 <batch-service-utility>
 	<Config>
 		<!-- Configuration for perosonal subscription -->
-		<BatchAccountName>azurebatchpoc</BatchAccountName>
-		<BatchAccessKey>PmWnRbeONXqgkCudDA1JKSnUrhHAGu7XmXvmoRy0suOL/lw2KABzYUVb8hHFyaZ8e7OA8SYO7Ynf+ABanSsE7g==</BatchAccessKey>
-		<BatchUri>https://azurebatchpoc.uksouth.batch.azure.com</BatchUri>
+		<BatchAccountName>azurebatchservice</BatchAccountName>
+		<BatchAccessKey>8/bh1mdvVtNClcpaEtNBS/EQ/Q77O3tLGwTGV1HGoBzIY+eN6SKqFcl33LtW57l2gJfByqOrs7th+ABaNwepUQ==</BatchAccessKey>
+		<BatchUri>https://azurebatchservice.uksouth.batch.azure.com</BatchUri>
 		<StorageAccountName>samplepoc2022</StorageAccountName>
 		<StorageAccountKey>gF/wMAN3w28a/HBI8hU6PRb00mHb+gUzWOLyae8n5Ss34P9rsrfgg/vaY/+aan0/QhtY/pVMDsUT+AStqT2Jog==</StorageAccountKey>
 		<StorageContainerName>azure-batch-storage</StorageContainerName>
@@ -14,7 +14,7 @@
 		<PoolId>devceployaba01-pool-01</PoolId>
 		<TaskCount>1</TaskCount>
 		<NodeCount>1</NodeCount>
-		<CreatePool>true</CreatePool>
+		<CreatePool>false</CreatePool>
 		<OSPublisher>canonical</OSPublisher>
 		<OSOffer>0001-com-ubuntu-server-focal</OSOffer>
 		<PoolVmSize>Standard_DS1_v2</PoolVmSize>

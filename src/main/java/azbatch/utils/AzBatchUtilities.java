@@ -65,8 +65,7 @@ public class AzBatchUtilities {
             TimeoutException, 
             URISyntaxException, StorageException, InvalidKeyException {
 
-        CloudPool pool = null;
-        StartTask poolStartTask = new StartTask();
+        CloudPool pool = null;       
         String osPublisher = map.get("OS_PUBLISHER");
         String osOffer = map.get("OS_OFFER");
         String poolVMSize = map.get("POOL_VM_SIZE");
@@ -109,31 +108,39 @@ public class AzBatchUtilities {
             VirtualMachineConfiguration configuration = new VirtualMachineConfiguration();
             configuration
                     .withNodeAgentSKUId(skuId)
-                    .withImageReference(imageRef);
-
-            // download metadata files needed in each nodes
-            String[] appfiles = { "libvibesimplejava.so" };
-            List<ResourceFile> files = new ArrayList<>();
-            for (String fileName : appfiles) {
-                String localPath = "./" + fileName;
-                String signedUrl = StorageUtil.getBlobBlockSasUri(container, "apps", fileName, map);
-                files.add(new ResourceFile()
-                        .withHttpUrl(signedUrl)
-                        .withFilePath(localPath));
-            }
-            // creating pool start tasks to be performed in each nodes            
-            poolStartTask
-                    .withCommandLine("sudo apt-get update && sudo apt-get install -y openjdk-8-jdk")
-                    .withResourceFiles(files)
-                    .withWaitForSuccess(true)
-                    .withMaxTaskRetryCount(1)
-                    //.withUserIdentity(null)
+                    .withImageReference(imageRef)
                     ;
 
-            client.poolOperations().createPool(poolId, poolVMSize, configuration, targetDedicatedNode, targetLowPriorityNode);
-            // client.poolOperations().createPool(poolId, poolVMSize, configuration, poolVMCount);
-            pool = client.poolOperations().getPool(poolId);
-            pool.withStartTask(poolStartTask);
+            // download metadata files needed in each nodes
+            // String[] appfiles = { "libvibesimplejava.so" };
+            // List<ResourceFile> files = new ArrayList<>();
+            // for (String fileName : appfiles) {
+            //     String localPath = "./" + fileName;
+            //     String signedUrl = StorageUtil.getBlobBlockSasUri(container, "apps", fileName, map);
+            //     files.add(new ResourceFile()
+            //             .withHttpUrl(signedUrl)
+            //             .withFilePath(localPath));
+            // }
+
+            /*
+             * Task to run on each compute node as it joins the pool.
+             * The task runs when the node is added to the pool or when the node is
+             * restarted.
+             */
+            StartTask poolStartTask = new StartTask()
+                    .withCommandLine("sudo apt-get update && sudo apt-get install -y openjdk-11-jdk")
+                    // .withResourceFiles(files)
+                    .withWaitForSuccess(true)
+                    .withMaxTaskRetryCount(1);
+
+            client
+                .poolOperations()
+                .createPool(poolId, poolVMSize, configuration, targetDedicatedNode, targetLowPriorityNode);
+
+            pool = client
+                    .poolOperations()
+                    .getPool(poolId)
+                    .withStartTask(poolStartTask);       
             
         }  
         
@@ -218,16 +225,16 @@ public class AzBatchUtilities {
         }
 
         //download application metadata folder for the Voltage operation
-        String[] appfolders = { "trustStore"};
-        for (String folder : appfolders) {
-            Map<String, String> signedUrls = StorageUtil.getBlobDirSasUri(container, folder, map);
-            for (Entry<String, String> entry : signedUrls.entrySet()) {
-                String localPath = folder + "/" + entry.getKey();                
-                files.add(new ResourceFile()
-                        .withHttpUrl(entry.getValue())
-                        .withFilePath(localPath));
-            }
-        }
+        // String[] appfolders = { "trustStore"};
+        // for (String folder : appfolders) {
+        //     Map<String, String> signedUrls = StorageUtil.getBlobDirSasUri(container, folder, map);
+        //     for (Entry<String, String> entry : signedUrls.entrySet()) {
+        //         String localPath = folder + "/" + entry.getKey();                
+        //         files.add(new ResourceFile()
+        //                 .withHttpUrl(entry.getValue())
+        //                 .withFilePath(localPath));
+        //     }
+        // }
 
         //uploading log files from nodes to storage      
         List<OutputFile> logfiles = new ArrayList<>();       
@@ -254,7 +261,7 @@ public class AzBatchUtilities {
             tasks.add(new TaskAddParameter()
                     .withId("voltage-batch-task" + i)
                     .withCommandLine(
-                            "java -cp boots-voltage-fle-utility-0.0.1-jar-with-dependencies.jar com.boots.voltage.VoltageMainApplication \"voltage_service_config_01.xml\" both")
+                            "java -cp boots-voltage-fle-utility-0.0.1-jar-with-dependencies.jar com.boots.voltage.VoltageMainApplication \"voltage_service_config_01.xml\" \"both\"")
                     .withResourceFiles(files)
                     .withOutputFiles(logfiles)
                     );
