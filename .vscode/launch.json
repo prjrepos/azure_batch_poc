@@ -9,23 +9,17 @@
             "name": "AzureBatchService",
             "request": "launch",
             "mainClass": "AzureBatchService",
-            "projectName": "AzureBatchService"
+            "projectName": "AzureBatchService",
+            "args": [
+                "src/main/resources/batch_service_config_01.xml"
+                
+            ]
         },
         {
             "type": "java",
             "name": "Current File",
             "request": "launch",
             "mainClass": "${file}"
-        },
-        {
-            "type": "java",
-            "name": "AzureBatchService",
-            "request": "launch",
-            "mainClass": "AzureBatchService",
-            "projectName": "azure-batch-service",
-            "args": [
-                "/home/prasenjit/dev-workspace/ws-azure-java/java_azure_batch/src/main/resources/batch_service_config_01.xml"
-            ]
         }
     ]
 }

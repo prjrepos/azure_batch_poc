@@ -58,7 +58,7 @@ public class AzureBatchService {
             // Submit a job and wait for completion
             AzBatchUtilities.submitJob(client, container, sharedPool.id(), jobId, ConfigMap);
             AzBatchUtilities.waitForTasksToComplete(client, jobId, Duration.ofMinutes(5));
-            logger.info("\nTask Results");
+            logger.info("Task Results");
             logger.info("------------------------------------------------------");
             List<CloudTask> tasks = client.taskOperations().listTasks(jobId);
             for (CloudTask task : tasks) {
