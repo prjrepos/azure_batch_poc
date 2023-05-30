@@ -17,6 +17,7 @@ public class AzureBatchService {
 
     private static final Logger logger = LogManager.getLogger(AzureBatchService.class);  
     static Map<String, String> ConfigMap = new HashMap<String, String>();
+    
 
     /**
      * Method to read create Pool, assign node into Pool, create Job, create task
@@ -33,6 +34,7 @@ public class AzureBatchService {
     public static void main(String[] argv) throws Exception {
 
         ConfigMap = BatchConfigUtil.readConfigXML(argv[0]);
+        String operation = argv[1];
         
         // Get Batch and storage account information from environment        
         String BATCH_ACCOUNT = ConfigMap.get("BATCH_ACCOUNT");
@@ -56,7 +58,7 @@ public class AzureBatchService {
                 sharedPool = client.poolOperations().getPool(poolId);
             }                
             // Submit a job and wait for completion
-            AzBatchUtilities.submitJob(client, container, sharedPool.id(), jobId, ConfigMap);
+            AzBatchUtilities.submitJob(client, container, sharedPool.id(), jobId, ConfigMap, operation);
             AzBatchUtilities.waitForTasksToComplete(client, jobId, Duration.ofMinutes(5));
             logger.info("Task Results");
             logger.info("------------------------------------------------------");

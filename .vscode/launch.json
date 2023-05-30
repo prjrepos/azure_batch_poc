@@ -11,7 +11,8 @@
             "mainClass": "AzureBatchService",
             "projectName": "AzureBatchService",
             "args": [
-                "src/main/resources/batch_service_config_01.xml"
+                "src/main/resources/batch_service_config_01.xml",
+                "decrypt"
                 
             ]
         },

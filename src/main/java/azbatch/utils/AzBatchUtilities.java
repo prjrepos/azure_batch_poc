@@ -135,16 +135,15 @@ public class AzBatchUtilities {
              */
 
             
-             StartTask poolStartTask = new StartTask()
+            StartTask poolStartTask = new StartTask()
                     .withCommandLine("/bin/bash -c \"sudo apt-get update && sudo apt-get install -y openjdk-11-jdk\"")
-                    
                     .withUserIdentity(new UserIdentity()
-                                            .withAutoUser(new AutoUserSpecification()
-                                                                .withScope(AutoUserScope.POOL)
-                                                                .withElevationLevel(ElevationLevel.ADMIN)))
+                            .withAutoUser(new AutoUserSpecification()
+                                    .withScope(AutoUserScope.POOL)
+                                    .withElevationLevel(ElevationLevel.ADMIN)))
                     // .withResourceFiles(files)
                     .withWaitForSuccess(true)
-                    .withMaxTaskRetryCount(1);           
+                    .withMaxTaskRetryCount(1);        
 
             PoolAddParameter param = new PoolAddParameter()
                                         .withStartTask(poolStartTask)
@@ -219,7 +218,7 @@ public class AzBatchUtilities {
      * @param taskCount How many tasks to add
      */
     public static void submitJob(BatchClient client, CloudBlobContainer container, String poolId, String jobId,
-            Map<String, String> map)
+            Map<String, String> map, String operation)
             throws BatchErrorException, IOException, StorageException, InvalidKeyException, InterruptedException,
             URISyntaxException {
 
@@ -282,7 +281,7 @@ public class AzBatchUtilities {
             tasks.add(new TaskAddParameter()
                     .withId("voltage-batch-task" + i)
                     .withCommandLine(
-                            "java -cp boots-voltage-fle-utility-0.0.1-jar-with-dependencies.jar com.boots.voltage.VoltageMainApplication \"voltage_service_config_01.xml\" \"both\"")
+                            "java -cp boots-voltage-fle-utility-0.0.1-jar-with-dependencies.jar com.boots.voltage.VoltageMainApplication \"voltage_service_config_01.xml\" " + operation)
                     .withResourceFiles(files)
                     .withOutputFiles(logfiles));
         }
