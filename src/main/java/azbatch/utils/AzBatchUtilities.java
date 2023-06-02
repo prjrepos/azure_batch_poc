@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
@@ -62,7 +61,7 @@ public class AzBatchUtilities {
      * @return A newly created or existing pool
      */
     public static CloudPool createPoolIfNotExists(BatchClient client, Map<String, String> map,
-            CloudBlobContainer container)
+            CloudBlobContainer container, String operation)
             throws BatchErrorException,
             IllegalArgumentException,
             IOException,
@@ -74,7 +73,7 @@ public class AzBatchUtilities {
         String osPublisher = map.get("OS_PUBLISHER");
         String osOffer = map.get("OS_OFFER");
         String poolVMSize = map.get("POOL_VM_SIZE");
-        String poolId = map.get("POOL_ID");
+        String poolId = map.get("POOL_ID") + "-" + operation;
         int poolVMCount = Integer.parseInt(map.get("POOL_VM_COUNT"));
         // int NODE_COUNT = Integer.parseInt(map.get("NODE_COUNT"));
         int targetDedicatedNode = Integer.parseInt(map.get("TARGET_DEDICATED_NODE"));
@@ -279,9 +278,10 @@ public class AzBatchUtilities {
         List<TaskAddParameter> tasks = new ArrayList<>();
         for (int i = 0; i < taskCount; i++) {
             tasks.add(new TaskAddParameter()
-                    .withId("voltage-batch-task" + i)
+                    .withId("batch-task-" + i + "-" + operation)
                     .withCommandLine(
-                            "java -cp boots-voltage-fle-utility-0.0.1-jar-with-dependencies.jar com.boots.voltage.VoltageMainApplication \"voltage_service_config_01.xml\" " + operation)
+                            "java -cp boots-voltage-fle-utility-0.0.1-jar-with-dependencies.jar com.boots.voltage.VoltageMainApplication \"voltage_service_config_01.xml\" "
+                                    + operation)
                     .withResourceFiles(files)
                     .withOutputFiles(logfiles));
         }

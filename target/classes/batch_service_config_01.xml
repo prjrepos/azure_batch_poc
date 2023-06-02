@@ -27,9 +27,6 @@
 		<CleanUpJob>true</CleanUpJob>
 		<!-- warning: Skipping pool deletion will greatly speed up subsequent runs -->
 		<CleanUpPool>true</CleanUpPool>
-		<ServiceName>voltage-service</ServiceName>
-		<Operation>both</Operation>
-		<!-- <Operation>encrypt</Operation> -->
-		<!-- <Operation>decrypt</Operation> -->
+		<ServiceName>voltage-service</ServiceName>		
 	</Config>
 </batch-service-utility>
