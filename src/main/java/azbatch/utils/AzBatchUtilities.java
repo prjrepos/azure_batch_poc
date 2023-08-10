@@ -131,9 +131,7 @@ public class AzBatchUtilities {
              * Task to run on each compute node as it joins the pool.
              * The task runs when the node is added to the pool or when the node is
              * restarted.
-             */
-
-            
+             */            
             StartTask poolStartTask = new StartTask()
                     .withCommandLine("/bin/bash -c \"sudo apt-get update && sudo apt-get install -y openjdk-11-jdk\"")
                     .withUserIdentity(new UserIdentity()
