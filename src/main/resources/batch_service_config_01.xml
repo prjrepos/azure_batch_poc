@@ -3,10 +3,10 @@
 	<Config>
 		<!-- Configuration for perosonal subscription -->
 		<BatchAccountName>azurebatchservice</BatchAccountName>
-		<BatchAccessKey>uMk7LYelBLMyC1US8VSqcIx9DB8N6rxBUxPWE5/lxYxJOIgZP3wM5eymy4NUGvSweZDhceATxtMx+ABaulyB3Q==</BatchAccessKey>
+		<BatchAccessKey></BatchAccessKey>
 		<BatchUri>https://azurebatchservice.uksouth.batch.azure.com</BatchUri>
 		<StorageAccountName>samplepoc2022</StorageAccountName>
-		<StorageAccountKey>gF/wMAN3w28a/HBI8hU6PRb00mHb+gUzWOLyae8n5Ss34P9rsrfgg/vaY/+aan0/QhtY/pVMDsUT+AStqT2Jog==</StorageAccountKey>
+		<StorageAccountKey></StorageAccountKey>
 		<StorageContainerName>azure-batch-storage</StorageContainerName>
 		<!-- Common Configuration -->
 		<AppMetdataDirectory>azbatch-voltage-metadata</AppMetdataDirectory>
